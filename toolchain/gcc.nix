@@ -1,6 +1,6 @@
-{stdenv, fetchurl, crossConfig}:
+{mkDerivation, fetchurl, crossConfig, cross-binutils, strace}:
 
-stdenv.mkDerivation rec {
+mkDerivation rec {
   name = "gcc";
   full_name = gcc_version;
 
@@ -32,6 +32,16 @@ stdenv.mkDerivation rec {
     mpc_src
   ];
 
+  buildInputs = [ cross-binutils ];
+  nativeBuildInputs = [ strace ];
+  hardeningDisable = [ "format" ];  # to build the cross-compiler
+
+  host = crossConfig.host;
+  target = crossConfig.target;
+  arm_arch = crossConfig.arm_arch;
+  float = crossConfig.float;
+  fpu = crossConfig.fpu;
+
   phases = [
     "unpackPhase"
     "configurePhase"
@@ -40,6 +50,10 @@ stdenv.mkDerivation rec {
   ];
 
   unpackPhase = ''
+    echo whoami $(whoami)
+    gcc --version
+    mkdir src
+    cd src
     for src in $srcs
     do
       tar xaf $src
@@ -50,19 +64,24 @@ stdenv.mkDerivation rec {
     cd gcc-*
     mv mpfr-* mpfr -v
     mv gmp-* gmp -v
-    #mv mpc-* mpc -v
+    mv mpc-* mpc -v
     cd ..
     mkdir gcc-build
     cd gcc-build
+    #mkdir -p $out/cross-tools/${target}
+    #echo "hello" > $out
+    #echo $(pwd) > $out
+    #echo $(ls) > $out
+    #mkdir -p -- .deps
   '';
 
   configurePhase = ''
     ../${gcc_version}/configure \
-        --build=${crossConfig.host} \
-        --host=${crossConfig.host} \
-        --target=${crossConfig.target} \
+        --build=${host} \
+        --host=${host} \
+        --target=${target} \
         --prefix=$out/cross-tools \
-        --with-sysroot=$out/cross-tools/${crossConfig.target} \
+        --with-sysroot=$out/cross-tools/${target} \
         --disable-nls \
         --disable-shared \
         --without-headers \
@@ -76,9 +95,9 @@ stdenv.mkDerivation rec {
         --disable-threads \
         --enable-languages=c \
         --disable-multilib \
-        --with-arch=${crossConfig.arch} \
-        --with-float=${crossConfig.float} \
-        --with-fpu=${crossConfig.fpu}
+        --with-arch=${arm_arch} \
+        --with-float=${float} \
+        --with-fpu=${fpu}
   '';
 
   buildPhase = ''
