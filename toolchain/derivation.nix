@@ -5,4 +5,7 @@ rec {
   binutils = callPackage ./binutils.nix {
     crossConfig = crossConfig;
   };
+  gcc = callPackage ./gcc.nix {
+    crossConfig = crossConfig;
+  };
 }

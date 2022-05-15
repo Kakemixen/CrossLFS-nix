@@ -21,7 +21,6 @@ stdenv.mkDerivation rec {
   '';
 
   configurePhase = ''
-    mkdir -p $out/cross-tools/${crossConfig.target}
     ./configure \
        --prefix=$out/cross-tools \
        --target=${crossConfig.target} \
