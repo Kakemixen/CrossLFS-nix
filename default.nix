@@ -15,9 +15,10 @@ let
 
   toolchain = callPackage ./toolchain/derivation.nix {
     crossConfig = crossConfig;
-    env = pkgs.gcc11Stdenv;
+    CCEnv = pkgs.gcc11Stdenv;
+    noCCEnv = pkgs.stdenvNoCC;
     fetchurl = pkgs.fetchurl;
     callPackage = pkgs.callPackage;
   };
 in
-  toolchain.gcc
+  toolchain.musl
