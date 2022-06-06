@@ -22,9 +22,9 @@ stdenv.mkDerivation rec {
 
   configurePhase = ''
     ./configure \
-       --prefix=$out/cross-tools \
+       --prefix=$out \
        --target=${crossConfig.target} \
-       --with-sysroot=$out/cross-tools/${crossConfig.target} \
+       --with-sysroot=$out/${crossConfig.target} \
        --disable-nls \
        --disable-multilib && \
     make configure-host

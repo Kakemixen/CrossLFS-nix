@@ -80,8 +80,8 @@ mkDerivation rec {
         --build=${host} \
         --host=${host} \
         --target=${target} \
-        --prefix=$out/cross-tools \
-        --with-sysroot=$out/cross-tools/${target} \
+        --prefix=$out \
+        --with-sysroot=$out/${target} \
         --disable-nls \
         --disable-shared \
         --without-headers \
