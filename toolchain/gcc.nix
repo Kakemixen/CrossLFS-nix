@@ -32,7 +32,6 @@ mkDerivation rec {
     mpc_src
   ];
 
-  muslEnv = musl;
   buildInputs = if musl == null then [ cross-binutils ] else [ cross-binutils musl ];
   hardeningDisable = [ "format" ];  # to build the cross-compiler
 
@@ -116,13 +115,22 @@ mkDerivation rec {
     make install
   '';
 
+  muslEnv = musl;
+  binutilsEnv = cross-binutils;
   libConfigurePhase = ''
+    # make tmp rootfs
+    mkdir -p ../rootfs/${target}
+    ln -sf . ../rootfs/${target}/usr # this is kinda weird
+    cp -r $muslEnv/* ../rootfs/
+    chmod u+w -R ../rootfs   # why is this necessary?
+    cp -r $binutilsEnv/* ../rootfs/
+
     ../${gcc_version}/configure \
         --build=${host} \
         --host=${host} \
         --target=${target} \
         --prefix=$out \
-        --with-sysroot=$out/${target} \
+        --with-sysroot=$(pwd)/../rootfs/${target} \
         --disable-nls \
         --enable-languages=c \
         --enable-c99 \
