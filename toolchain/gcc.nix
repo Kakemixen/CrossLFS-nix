@@ -1,7 +1,7 @@
-{mkDerivation, fetchurl, crossConfig, cross-binutils, strace}:
+{mkDerivation, fetchurl, crossConfig, cross-binutils, musl ? null}:
 
 mkDerivation rec {
-  name = "gcc";
+  name = if musl == null then "gcc-static" else "gcc";
   full_name = gcc_version;
 
   gcc_version="gcc-11.2.0";
@@ -32,8 +32,8 @@ mkDerivation rec {
     mpc_src
   ];
 
-  buildInputs = [ cross-binutils ];
-  nativeBuildInputs = [ strace ];
+  muslEnv = musl;
+  buildInputs = if musl == null then [ cross-binutils ] else [ cross-binutils musl ];
   hardeningDisable = [ "format" ];  # to build the cross-compiler
 
   host = crossConfig.host;
@@ -75,7 +75,7 @@ mkDerivation rec {
     #mkdir -p -- .deps
   '';
 
-  configurePhase = ''
+  staticConfigurePhase = ''
     ../${gcc_version}/configure \
         --build=${host} \
         --host=${host} \
@@ -100,11 +100,41 @@ mkDerivation rec {
         --with-fpu=${fpu}
   '';
 
-  buildPhase = ''
+  staticBuildPhase = ''
     make -j42 all-gcc all-target-libgcc
   '';
 
-  installPhase = ''
+  staticInstallPhase = ''
     make install-gcc install-target-libgcc
   '';
+
+  libBuildPhase = ''
+    make -j42
+  '';
+
+  libInstallPhase = ''
+    make install
+  '';
+
+  libConfigurePhase = ''
+    ../${gcc_version}/configure \
+        --build=${host} \
+        --host=${host} \
+        --target=${target} \
+        --prefix=$out \
+        --with-sysroot=$out/${target} \
+        --disable-nls \
+        --enable-languages=c \
+        --enable-c99 \
+        --enable-long-long \
+        --disable-libmudflap \
+        --disable-multilib \
+        --with-arch=${arm_arch} \
+        --with-float=${float} \
+        --with-fpu=${fpu}
+  '';
+
+  configurePhase = if musl == null then staticConfigurePhase else libConfigurePhase;
+  buildPhase = if musl == null then staticBuildPhase else libBuildPhase;
+  installPhase = if musl == null then staticInstallPhase else libInstallPhase;
 }

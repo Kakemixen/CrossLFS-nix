@@ -21,4 +21,4 @@ let
     callPackage = pkgs.callPackage;
   };
 in
-  toolchain.musl
+  toolchain.gcc
