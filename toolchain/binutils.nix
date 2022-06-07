@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
   '';
 
   buildPhase = ''
-    make -j42
+    make -j$NIX_BUILD_CORES
   '';
 
   installPhase = ''

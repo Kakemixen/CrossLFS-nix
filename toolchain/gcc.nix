@@ -101,7 +101,7 @@ mkDerivation rec {
   '';
 
   staticBuildPhase = ''
-    make -j42 all-gcc all-target-libgcc
+    make -j$NIX_BUILD_CORES all-gcc all-target-libgcc
   '';
 
   staticInstallPhase = ''
@@ -109,7 +109,7 @@ mkDerivation rec {
   '';
 
   libBuildPhase = ''
-    make -j42
+    make -j$NIX_BUILD_CORES
   '';
 
   libInstallPhase = ''
