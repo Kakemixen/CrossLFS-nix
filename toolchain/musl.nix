@@ -32,7 +32,7 @@ mkDerivation rec {
     export PATH=$binutilsEnv/${target}/bin:$PATH
     ./configure \
       CROSS_COMPILE=${target}- \
-      --prefix=$out \
+      --prefix=/ \
       --target=${target} \
       --build=${host}
   '';
