@@ -27,7 +27,9 @@ mkDerivation rec {
     cd musl-*
   '';
 
+  binutilsEnv = cross-binutils;
   configurePhase = ''
+    export PATH=$binutilsEnv/${target}/bin:$PATH
     ./configure \
       CROSS_COMPILE=${target}- \
       --prefix=$out \
