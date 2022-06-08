@@ -18,6 +18,9 @@ env.mkDerivation rec {
     toolchain.musl
     pkgs.flex
     pkgs.bison
+    pkgs.bc
+    pkgs.openssl
+    pkgs.perl
   ];
 
   unpackPhase = ''
@@ -50,7 +53,7 @@ env.mkDerivation rec {
   installPhase = ''
     mkdir -p $out/boot
 
-    INSTALL_PATH=$out/boot make instal
+    INSTALL_PATH=$out/boot make install
     cp arch/arm/boot/*Image $out/boot
     cp -r arch/arm/boot/dts/* $out/boot
 
