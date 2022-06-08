@@ -1,7 +1,7 @@
-{mkDerivation, sources, crossConfig, cross-binutils, musl}:
+{mkDerivation, sources, crossConfig, cross-binutils}:
 
 mkDerivation rec {
-  name = "gcc";
+  name = "gcc-static";
 
   srcs = [
     sources.gcc
@@ -25,7 +25,7 @@ mkDerivation rec {
     "installPhase"
   ];
 
-  buildInputs = [ cross-binutils musl ];
+  buildInputs = [ cross-binutils ];
 
   unpackPhase = ''
     echo whoami $(whoami)
@@ -48,27 +48,25 @@ mkDerivation rec {
     cd gcc-build
   '';
 
-  muslEnv = musl;
-  binutilsEnv = cross-binutils;
   configurePhase = ''
-    # make tmp rootfs
-    mkdir -p ../rootfs/${target}
-    ln -sf . ../rootfs/${target}/usr # this is kinda weird
-    cp -r $muslEnv/* ../rootfs/
-    chmod u+w -R ../rootfs   # why is this necessary?
-    cp -r $binutilsEnv/* ../rootfs/
-
     ../${sources.gcc_version}/configure \
         --build=${host} \
         --host=${host} \
         --target=${target} \
         --prefix=$out \
-        --with-sysroot=$(pwd)/../rootfs/${target} \
+        --with-sysroot=$out/${target} \
         --disable-nls \
-        --enable-languages=c \
-        --enable-c99 \
-        --enable-long-long \
+        --disable-shared \
+        --without-headers \
+        --with-newlib \
+        --disable-decimal-float \
+        --disable-libgomp \
         --disable-libmudflap \
+        --disable-libssp \
+        --disable-libatomic \
+        --disable-libquadmath \
+        --disable-threads \
+        --enable-languages=c \
         --disable-multilib \
         --with-arch=${arm_arch} \
         --with-float=${float} \
@@ -76,10 +74,10 @@ mkDerivation rec {
   '';
 
   buildPhase = ''
-    make -j$NIX_BUILD_CORES
+    make -j$NIX_BUILD_CORES all-gcc all-target-libgcc
   '';
 
   installPhase = ''
-    make install
+    make install-gcc install-target-libgcc
   '';
 }

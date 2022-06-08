@@ -10,12 +10,11 @@ rec {
     sources = sources;
     crossConfig = crossConfig;
   };
-  gcc-static = callPackage ./gcc.nix {
+  gcc-static = callPackage ./gcc_static.nix {
     sources = sources;
     cross-binutils = cross-binutils;
     crossConfig = crossConfig;
     mkDerivation = CCEnv.mkDerivation;
-    musl = null;
   };
   musl = callPackage ./musl.nix {
     sources = sources;
