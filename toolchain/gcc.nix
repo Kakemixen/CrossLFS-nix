@@ -1,4 +1,4 @@
-{mkDerivation, sources, crossConfig, cross-binutils, musl}:
+{mkDerivation, sources, crossConfig, binutils, sysroot}:
 
 mkDerivation rec {
   name = "gcc";
@@ -25,7 +25,7 @@ mkDerivation rec {
     "installPhase"
   ];
 
-  buildInputs = [ cross-binutils musl ];
+  buildInputs = [ binutils ];
 
   unpackPhase = ''
     echo whoami $(whoami)
@@ -48,22 +48,13 @@ mkDerivation rec {
     cd gcc-build
   '';
 
-  muslEnv = musl;
-  binutilsEnv = cross-binutils;
   configurePhase = ''
-    # make tmp rootfs
-    mkdir -p ../rootfs/${target}
-    ln -sf . ../rootfs/${target}/usr # this is kinda weird
-    cp -r $muslEnv/* ../rootfs/
-    chmod u+w -R ../rootfs   # why is this necessary?
-    cp -r $binutilsEnv/* ../rootfs/
-
     ../${sources.gcc_version}/configure \
         --build=${host} \
         --host=${host} \
         --target=${target} \
         --prefix=$out \
-        --with-sysroot=$(pwd)/../rootfs/${target} \
+        --with-sysroot=${sysroot}/${target} \
         --disable-nls \
         --enable-languages=c \
         --enable-c99 \

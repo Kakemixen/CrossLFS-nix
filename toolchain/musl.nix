@@ -1,11 +1,11 @@
-{mkDerivation, sources, crossConfig, gcc, cross-binutils, strace}:
+{mkDerivation, sources, crossConfig, gcc, binutils, strace}:
 
 mkDerivation rec {
   name = "musl";
 
   src = sources.musl;
 
-  buildInputs = [ cross-binutils gcc ];
+  buildInputs = [ binutils gcc ];
 
   host = crossConfig.host;
   target = crossConfig.target;
@@ -25,7 +25,7 @@ mkDerivation rec {
     cd musl-*
   '';
 
-  binutilsEnv = cross-binutils;
+  binutilsEnv = binutils;
   configurePhase = ''
     export PATH=$binutilsEnv/${target}/bin:$PATH
     ./configure \

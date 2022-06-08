@@ -1,33 +1,51 @@
-{CCEnv, noCCEnv, fetchurl, callPackage, crossConfig}:
+{pkgs, CCEnv, noCCEnv, fetchurl, callPackage, crossConfig}:
 
-rec {
+let
   sources = callPackage ./sources.nix {
     fetchurl = fetchurl;
   };
 
   name = "rpi-toolchain";
-  cross-binutils = callPackage ./binutils.nix {
+  usr-symlink = noCCEnv.mkDerivation {
+    name = "usr-symlink";
+    unpackPhase = "true";
+    installPhase = ''
+      mkdir -p $out/${crossConfig.target}
+      ln -sf . $out/${crossConfig.target}/usr
+      '';
+  };
+  binutils = callPackage ./binutils.nix {
     sources = sources;
     crossConfig = crossConfig;
   };
   gcc-static = callPackage ./gcc_static.nix {
     sources = sources;
-    cross-binutils = cross-binutils;
+    binutils = binutils;
     crossConfig = crossConfig;
     mkDerivation = CCEnv.mkDerivation;
   };
   musl = callPackage ./musl.nix {
     sources = sources;
     gcc = gcc-static;
-    cross-binutils = cross-binutils;
+    binutils = binutils;
     crossConfig = crossConfig;
     mkDerivation = noCCEnv.mkDerivation;
   };
+  sysroot = pkgs.symlinkJoin {
+    name = "sysroot-cross-toolchain";
+    paths = [ usr-symlink musl ];
+  };
   gcc = callPackage ./gcc.nix {
     sources = sources;
-    cross-binutils = cross-binutils;
+    binutils = binutils;
     crossConfig = crossConfig;
     mkDerivation = CCEnv.mkDerivation;
-    musl = musl;
+    sysroot = sysroot;
   };
-}
+in
+  {
+    sysroot = sysroot;
+    binutils = binutils;
+    musl = musl;
+    gcc = gcc;
+  }

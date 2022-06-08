@@ -1,4 +1,4 @@
-{mkDerivation, sources, crossConfig, cross-binutils}:
+{mkDerivation, sources, crossConfig, binutils}:
 
 mkDerivation rec {
   name = "gcc-static";
@@ -25,7 +25,7 @@ mkDerivation rec {
     "installPhase"
   ];
 
-  buildInputs = [ cross-binutils ];
+  buildInputs = [ binutils ];
 
   unpackPhase = ''
     echo whoami $(whoami)
