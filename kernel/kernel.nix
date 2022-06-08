@@ -38,7 +38,7 @@ env.mkDerivation rec {
     export CROSS_COMPILE=${target}-
     export PATH=${toolchain.binutils}/${target}/bin:$PATH
 
-    make bcm2709_defconfig
+    make bcm2835_defconfig
   '';
 
   buildPhase = ''
