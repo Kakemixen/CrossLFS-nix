@@ -20,5 +20,11 @@ let
     fetchurl = pkgs.fetchurl;
     callPackage = pkgs.callPackage;
   };
+
+  linux = callPackage ./kernel/derivation.nix {
+    env = pkgs.gcc11Stdenv;
+    toolchain = toolchain;
+    crossConfig = crossConfig;
+  };
 in
-  toolchain.gcc
+  linux.kernel
