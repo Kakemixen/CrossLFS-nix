@@ -39,7 +39,6 @@ env.mkDerivation rec {
   configurePhase = ''
     export ARCH=${arch}
     export CROSS_COMPILE=${target}-
-    export PATH=${toolchain.binutils}/${target}/bin:$PATH
 
     make bcm2835_defconfig
   '';

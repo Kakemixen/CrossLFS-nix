@@ -33,7 +33,7 @@ let
   };
   sysroot = pkgs.symlinkJoin {
     name = "sysroot-cross-toolchain";
-    paths = [ usr-symlink musl ];
+    paths = [ usr-symlink musl binutils ];
   };
   gcc = callPackage ./gcc.nix {
     sources = sources;
