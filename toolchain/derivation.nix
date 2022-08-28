@@ -42,10 +42,35 @@ let
     mkDerivation = CCEnv.mkDerivation;
     sysroot = sysroot;
   };
+  gmp = callPackage ./gmp.nix {
+    sources = sources;
+    binutils = binutils;
+    crossConfig = crossConfig;
+    mkDerivation = CCEnv.mkDerivation;
+    m4 = pkgs.m4;
+  };
+  mpfr = callPackage ./mpfr.nix {
+    sources = sources;
+    binutils = binutils;
+    crossConfig = crossConfig;
+    mkDerivation = CCEnv.mkDerivation;
+    gmp = gmp;
+  };
+  mpc = callPackage ./mpc.nix {
+    sources = sources;
+    binutils = binutils;
+    crossConfig = crossConfig;
+    mkDerivation = CCEnv.mkDerivation;
+    gmp = gmp;
+    mpfr = mpfr;
+  };
 in
   {
     sysroot = sysroot;
     binutils = binutils;
     musl = musl;
     gcc = gcc;
+    gmp = gmp;
+    mpc = mpc;
+    mpfr = mpfr;
   }
