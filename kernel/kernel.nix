@@ -16,11 +16,15 @@ env.mkDerivation rec {
     toolchain.gcc
     toolchain.binutils
     toolchain.musl
+    toolchain.gmp
+    toolchain.mpc
+    toolchain.mpfr
     pkgs.flex
     pkgs.bison
     pkgs.bc
     pkgs.openssl
     pkgs.perl
+    pkgs.libyaml
   ];
 
   unpackPhase = ''
@@ -40,7 +44,7 @@ env.mkDerivation rec {
     export ARCH=${arch}
     export CROSS_COMPILE=${target}-
 
-    make bcm2835_defconfig
+    make multi_v7_defconfig
   '';
 
   buildPhase = ''
