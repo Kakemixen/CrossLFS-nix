@@ -26,5 +26,12 @@ let
     toolchain = toolchain;
     crossConfig = crossConfig;
   };
+
+  boot_files = callPackage ./rpi/boot_files.nix {};
+
+  boot_partition = pkgs.symlinkJoin {
+    name = "boot-partition";
+    paths = [ linux.kernel boot_files ];
+  };
 in
-  linux.kernel
+  boot_partition
