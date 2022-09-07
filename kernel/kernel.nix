@@ -58,7 +58,7 @@ env.mkDerivation rec {
 
     INSTALL_PATH=$out/boot make install
     cp arch/arm/boot/*Image $out/boot
-    cp -r arch/arm/boot/dts/* $out/boot
+    cp -r arch/arm/boot/dts/bcm2837* $out/boot
 
     make INSTALL_MOD_PATH=$out modules_install
   '';
