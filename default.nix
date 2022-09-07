@@ -27,11 +27,21 @@ let
     crossConfig = crossConfig;
   };
 
+  boot = callPackage ./boot/derivation.nix {
+    env = pkgs.gcc11Stdenv;
+    toolchain = toolchain;
+    crossConfig = crossConfig;
+  };
+
   boot_files = callPackage ./rpi/boot_files.nix {};
 
   boot_partition = pkgs.symlinkJoin {
     name = "boot-partition";
-    paths = [ linux.kernel boot_files ];
+    paths = [
+      linux.kernel
+      boot.uboot
+      boot_files
+    ];
   };
 in
   boot_partition
