@@ -1,4 +1,4 @@
-{env, fetchurl, callPackage, toolchain, crossConfig}:
+{pkgs, env, fetchurl, callPackage, toolchain, crossConfig}:
 let
   sources = callPackage ./sources.nix {
     fetchurl = fetchurl;
@@ -15,6 +15,7 @@ in
     sources = sources;
     toolchain = toolchain;
     crossConfig = crossConfig;
+    rsync = pkgs.rsync;
   };
   kernel_boot = env.mkDerivation {
     name = "linux-clfs-boot";

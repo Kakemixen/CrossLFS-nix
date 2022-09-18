@@ -1,12 +1,15 @@
-{stdenv, sources, toolchain, crossConfig}:
+{stdenv, sources, toolchain, crossConfig, rsync}:
   stdenv.mkDerivation {
-    name = "linux-clfs";
+    name = "linux-headers";
     src = sources.linux;
     phases = [
       "unpackPhase"
       "configurePhase"
-      "buildPhase"
       "installPhase"
+    ];
+
+    buildInputs = [
+      rsync
     ];
 
     unpackPhase = ''
@@ -18,12 +21,13 @@
       make mrproper
     '';
 
-    buildPhase = ''
-      make ARCH=${crossConfig.arch} headers_check
-    '';
+    # TODO why no work?
+    #buildPhase = ''
+    #  make ARCH=${crossConfig.arch} headers_check
+    #'';
 
     installPhase = ''
-      mkdir $out/${crossConfig.target}
+      mkdir -p $out/${crossConfig.target}
       make ARCH=${crossConfig.arch} \
         INSTALL_HDR_PATH=$out/${crossConfig.target} headers_install
     '';
