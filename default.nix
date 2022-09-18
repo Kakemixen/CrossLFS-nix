@@ -44,11 +44,8 @@ let
     ];
   };
 
-  rootfs_partition = pkgs.symlinkJoin {
-    name = "rootfs-partition";
-    paths = [
-      linux.kernel_lib
-    ];
+  rootfs_partition = callPackage ./rootfs/derivation.nix {
+    linux = linux;
   };
 
   image = callPackage ./disk_img/derivation.nix {
