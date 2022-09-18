@@ -44,7 +44,7 @@ env.mkDerivation rec {
   '';
 
   installPhase = ''
-    mkdir -p $out/boot
-    cp u-boot.bin $out/boot
+    mkdir -p $out
+    cp u-boot.bin $out
   '';
 }

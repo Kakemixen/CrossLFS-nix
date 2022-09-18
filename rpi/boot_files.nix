@@ -21,13 +21,13 @@ in
     ];
 
     installPhase = ''
-      mkdir -p $out/boot
+      mkdir -p $out
       for src in $srcs
       do
         #get filename without nix hash
         name=$(echo $src | awk -F- '{ print $2}')
 
-        cp $src $out/boot/$name
+        cp -v $src $out/$name
       done
     '';
   }

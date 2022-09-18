@@ -38,7 +38,7 @@ let
   boot_partition = pkgs.symlinkJoin {
     name = "boot-partition";
     paths = [
-      linux.kernel
+      linux.kernel_boot
       boot.uboot
       boot_files
     ];
