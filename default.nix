@@ -15,10 +15,6 @@ let
 
   toolchain = callPackage ./toolchain/derivation.nix {
     crossConfig = crossConfig;
-    CCEnv = pkgs.gcc11Stdenv;
-    noCCEnv = pkgs.stdenvNoCC;
-    fetchurl = pkgs.fetchurl;
-    callPackage = pkgs.callPackage;
   };
 
   linux = callPackage ./kernel/derivation.nix {
@@ -27,21 +23,11 @@ let
     crossConfig = crossConfig;
   };
 
-  boot = callPackage ./boot/derivation.nix {
+  boot_partition = callPackage ./boot/derivation.nix {
     env = pkgs.gcc11Stdenv;
     toolchain = toolchain;
     crossConfig = crossConfig;
-  };
-
-  boot_files = callPackage ./rpi/boot_files.nix {};
-
-  boot_partition = pkgs.symlinkJoin {
-    name = "boot-partition";
-    paths = [
-      linux.kernel_boot
-      boot.uboot
-      boot_files
-    ];
+    linux = linux;
   };
 
   rootfs_partition = callPackage ./rootfs/derivation.nix {

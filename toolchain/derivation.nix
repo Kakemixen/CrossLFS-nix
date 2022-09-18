@@ -1,8 +1,12 @@
-{pkgs, CCEnv, noCCEnv, fetchurl, callPackage, crossConfig}:
+{pkgs, crossConfig}:
 
 let
+  CCEnv = pkgs.gcc11Stdenv;
+  noCCEnv = pkgs.stdenvNoCC;
+  callPackage = pkgs.callPackage;
+
   sources = callPackage ./sources.nix {
-    fetchurl = fetchurl;
+    fetchurl = pkgs.fetchurl;
   };
 
   name = "rpi-toolchain";
