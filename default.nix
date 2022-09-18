@@ -31,6 +31,7 @@ let
   };
 
   rootfs_partition = callPackage ./rootfs/derivation.nix {
+    env = pkgs.gcc11Stdenv;
     linux = linux;
   };
 
