@@ -1,6 +1,6 @@
 {pkgs, callPackage, bootfs, rootfs}:
 let
-  empty_image = callPackage ./empty_image.nix {
+  image = callPackage ./make_image.nix {
     env = pkgs.stdenv;
     parted = pkgs.parted;
     dosfstools = pkgs.dosfstools;
@@ -10,4 +10,4 @@ let
     rootfs = rootfs;
   };
 in
-  empty_image
+  image
