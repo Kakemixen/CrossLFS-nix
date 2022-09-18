@@ -64,10 +64,10 @@ env.mkDerivation {
 
     # rootfs
     extract_partition clfs.img 2 rootfs.part
-    mkfs.ext4 -F rootfs.part
+    mkdir rootfs
+    mkfs.ext4 -F rootfs.part -d $rootfs
     merge_partition clfs.img 2 rootfs.part
     rm rootfs.part
-
   '';
 
   installPhase = ''
