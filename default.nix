@@ -43,5 +43,10 @@ let
       boot_files
     ];
   };
+
+  image = callPackage ./disk_img/derivation.nix {
+    bootfs = boot_partition;
+    rootfs = null;
+  };
 in
-  boot_partition
+  image
