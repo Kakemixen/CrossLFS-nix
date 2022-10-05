@@ -32,6 +32,8 @@ let
 
   rootfs_partition = callPackage ./rootfs/derivation.nix {
     env = pkgs.gcc11Stdenv;
+    toolchain = toolchain;
+    crossConfig = crossConfig;
     linux = linux;
   };
 

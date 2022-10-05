@@ -1,0 +1,63 @@
+{env, sources, toolchain, crossConfig, linux-headers}:
+
+env.mkDerivation rec {
+  name = "busybox";
+
+  src = sources.busybox;
+
+  phases = [
+    "unpackPhase"
+    "configurePhase"
+    "buildPhase"
+    "installPhase"
+  ];
+
+  buildInputs = [
+    toolchain.gcc
+    toolchain.binutils
+    toolchain.musl
+    toolchain.gmp
+    toolchain.mpc
+    toolchain.mpfr
+    linux-headers
+  ];
+
+  unpackPhase = ''
+    tar xaf $src
+    cd busybox-*
+    make distclean
+  '';
+
+  arch = crossConfig.arch;
+  target = crossConfig.target;
+
+  configurePhase = ''
+    export ARCH=${arch}
+    export CROSS_COMPILE=${target}-
+
+    make defconfig
+
+    # Disable building both ifplugd and inetd as they both have issues building against musl:
+    sed -i 's/\(CONFIG_\)\(.*\)\(INETD\)\(.*\)=y/# \1\2\3\4 is not set/g' .config
+    sed -i 's/\(CONFIG_IFPLUGD\)=y/# \1 is not set/' .config
+
+    # Disable the use of utmp/wtmp as musl does not support them:
+    sed -i 's/\(CONFIG_FEATURE_WTMP\)=y/# \1 is not set/' .config
+    sed -i 's/\(CONFIG_FEATURE_UTMP\)=y/# \1 is not set/' .config
+
+
+    # Disable the use of ipsvd for both TCP and UDP as it has issues building against musl (similar to inetd's issues):
+    sed -i 's/\(CONFIG_UDPSVD\)=y/# \1 is not set/' .config
+    sed -i 's/\(CONFIG_TCPSVD\)=y/# \1 is not set/' .config
+  '';
+
+  buildPhase = ''
+    make -j$NIX_BUILD_CORES
+  '';
+
+  installPhase = ''
+    mkdir -p $out
+
+    CONFIG_PREFIX=$out make install
+  '';
+}
