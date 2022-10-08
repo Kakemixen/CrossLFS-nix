@@ -30,5 +30,7 @@
       mkdir -p $out/${crossConfig.target}
       make ARCH=${crossConfig.arch} \
         INSTALL_HDR_PATH=$out/${crossConfig.target} headers_install
+      make ARCH=${crossConfig.arch} \
+        INSTALL_HDR_PATH=$out headers_install
     '';
   }

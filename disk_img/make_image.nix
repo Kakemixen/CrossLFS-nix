@@ -1,4 +1,4 @@
-{env, parted, dosfstools, e2fsprogs, mtools, bootfs, rootfs}:
+{env, parted, coreutils, sed, dosfstools, e2fsprogs, mtools, bootfs, rootfs}:
 env.mkDerivation {
   name = "disk-image";
 
@@ -8,6 +8,8 @@ env.mkDerivation {
   ];
 
   nativeBuildInputs = [
+    coreutils
+    sed
     parted
     dosfstools
     e2fsprogs
@@ -18,6 +20,9 @@ env.mkDerivation {
 
   bootfs=bootfs;
   rootfs=rootfs;
+
+  coreutils=coreutils;
+
   buildPhase = ''
     dd if=/dev/zero of=clfs.img bs=1k count=2000000
 

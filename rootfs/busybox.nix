@@ -13,9 +13,7 @@ env.mkDerivation rec {
   ];
 
   buildInputs = [
-    toolchain.gcc
-    toolchain.binutils
-    toolchain.musl
+    env.cc
     toolchain.gmp
     toolchain.mpc
     toolchain.mpfr
@@ -58,6 +56,6 @@ env.mkDerivation rec {
   installPhase = ''
     mkdir -p $out
 
-    CONFIG_PREFIX=$out make install
+    make CONFIG_PREFIX=$out install
   '';
 }
