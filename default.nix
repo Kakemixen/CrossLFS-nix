@@ -38,23 +38,12 @@ let
     linux = linux;
   };
 
-  crossCC = pkgs.wrapCCWith rec {
-    name = "crossCC";
-    cc = toolchain.gcc;
-    bintools = pkgs.wrapBintoolsWith {
-      bintools = toolchain.binutils;
-      libc = toolchain.musl;
-      stdenvNoCC = crossEnvNoCc;
-    };
-    stdenvNoCC = crossEnvNoCc;
-  };
-
   # We still need the hostCC
   # TODO build hostCC as well? - ensure same version
   allCC = pkgs.symlinkJoin {
     name = "allCC";
     paths = [
-      crossCC
+      toolchain.gcc
       pkgs.gcc11Stdenv.cc
     ];
   };

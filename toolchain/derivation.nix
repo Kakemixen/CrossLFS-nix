@@ -1,15 +1,23 @@
 {pkgs, crossConfig}:
 
 let
-  CCEnv = pkgs.gcc11Stdenv;
-  noCCEnv = pkgs.stdenvNoCC;
-  callPackage = pkgs.callPackage;
-
   sources = callPackage ./sources.nix {
     fetchurl = pkgs.fetchurl;
   };
 
-  name = "rpi-toolchain";
+  CCEnv = pkgs.gcc11Stdenv;
+  noCCEnv = pkgs.stdenvNoCC;
+  callPackage = pkgs.callPackage;
+
+  myTargetPlatform = {
+      config = crossConfig.target;
+      libc = "musl";
+    };
+  myTargetPlatformElab = pkgs.lib.systems.elaborate myTargetPlatform;
+  crossEnvNoCC = pkgs.stdenvNoCC.override {
+    targetPlatform = myTargetPlatformElab;
+  };
+
   usr-symlink = noCCEnv.mkDerivation {
     name = "usr-symlink";
     unpackPhase = "true";
@@ -18,34 +26,62 @@ let
       ln -sf . $out/${crossConfig.target}/usr
       '';
   };
-  binutils = callPackage ./binutils.nix {
+  binutils_unwrapped = callPackage ./binutils.nix {
     sources = sources;
     crossConfig = crossConfig;
   };
-  gcc-static = callPackage ./gcc_static.nix {
+  binutils_nolib = pkgs.wrapBintoolsWith {
+    name = "binutils-nolib-wrapped";
+    bintools = binutils_unwrapped;
+    libc = null;
+    stdenvNoCC = crossEnvNoCC;
+  };
+
+  gcc_static_unwrapped = callPackage ./gcc_static.nix {
     sources = sources;
-    binutils = binutils;
+    binutils = binutils_nolib;
     crossConfig = crossConfig;
     mkDerivation = CCEnv.mkDerivation;
   };
+  gcc_static = pkgs.wrapCCWith rec {
+    name = "gcc-static-wrapped";
+    cc = gcc_static_unwrapped;
+    bintools = binutils_nolib;
+    stdenvNoCC = crossEnvNoCC;
+  };
+
   musl = callPackage ./musl.nix {
     sources = sources;
-    gcc = gcc-static;
-    binutils = binutils;
+    gcc = gcc_static;
     crossConfig = crossConfig;
-    mkDerivation = noCCEnv.mkDerivation;
+    mkDerivation = crossEnvNoCC.mkDerivation;
   };
+
+  binutils = pkgs.wrapBintoolsWith {
+    name = "binutils-wrapped";
+    bintools = binutils_unwrapped;
+    libc = musl;
+    stdenvNoCC = crossEnvNoCC;
+  };
+
   sysroot = pkgs.symlinkJoin {
     name = "sysroot-cross-toolchain";
     paths = [ usr-symlink musl binutils ];
   };
-  gcc = callPackage ./gcc.nix {
+  gcc_unwrapped = callPackage ./gcc.nix {
     sources = sources;
     binutils = binutils;
     crossConfig = crossConfig;
     mkDerivation = CCEnv.mkDerivation;
     sysroot = sysroot;
   };
+  gcc = pkgs.wrapCCWith rec {
+    name = "gcc-wrapped";
+    cc = gcc_unwrapped;
+    bintools = binutils;
+    stdenvNoCC = crossEnvNoCC;
+  };
+
   gmp = callPackage ./gmp.nix {
     sources = sources;
     binutils = binutils;

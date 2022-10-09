@@ -75,6 +75,5 @@ mkDerivation rec {
 
   installPhase = ''
     make install
-    cp -r ${sysroot}/* $out
   '';
 }
