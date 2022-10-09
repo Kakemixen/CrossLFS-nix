@@ -48,6 +48,7 @@ mkDerivation rec {
     cd gcc-build
   '';
 
+  # with-as/ld to make sure gcc finds correct binaries
   configurePhase = ''
     ../${sources.gcc_version}/configure \
         --build=${host} \
@@ -55,6 +56,8 @@ mkDerivation rec {
         --target=${target} \
         --prefix=$out \
         --with-sysroot=${sysroot}/${target} \
+        --with-as=${binutils}/bin/${target}-as \
+        --with-ld=${binutils}/bin/${target}-ld \
         --disable-nls \
         --enable-languages=c \
         --enable-c99 \
