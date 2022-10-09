@@ -12,16 +12,33 @@ let
   };
 
   boot_mount = env.mkDerivation {
-    name = "true";
+    name = "boot-mount";
     phases = [ "installPhase" ];
     installPhase = "mkdir -p $out/boot";
   };
+  symlinks = pkgs.symlinkJoin {
+    name = "rootfs-partition-parts";
+    paths = [
+      linux.kernel_lib
+      busybox
+      boot_mount
+    ];
+  };
 in
-pkgs.symlinkJoin {
-  name = "rootfs-partition";
-  paths = [
-    linux.kernel_lib
-    busybox
-    boot_mount
-  ];
-}
+  env.mkDerivation {
+    name = "rootfs-partition";
+    buildInputs = [
+      pkgs.coreutils
+      pkgs.bash
+    ];
+    rootfs = symlinks;
+    phases = [ "installPhase" ];
+    installPhase = ''
+      mkdir $out
+
+      find $rootfs -type f,l \
+      -exec ${./copy_rootfs.sh} {} $out \;
+
+      cp -rn $rootfs/* $out/
+    '';
+  }
