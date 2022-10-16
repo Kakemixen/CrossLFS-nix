@@ -35,6 +35,9 @@ env.mkDerivation rec {
 
     make defconfig
 
+    # make static
+    sed -i 's/# \(CONFIG_STATIC\) is not set/\1=y/' .config
+
     # Disable building both ifplugd and inetd as they both have issues building against musl:
     sed -i 's/\(CONFIG_\)\(.*\)\(INETD\)\(.*\)=y/# \1\2\3\4 is not set/g' .config
     sed -i 's/\(CONFIG_IFPLUGD\)=y/# \1 is not set/' .config
