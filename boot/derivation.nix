@@ -11,12 +11,20 @@ let
   };
 
   boot_files = pkgs.callPackage ./rpi/boot_files.nix {};
-in
-  pkgs.symlinkJoin {
+
+  partition = pkgs.symlinkJoin {
     name = "boot-partition";
     paths = [
       linux.kernel_boot
       uboot
       boot_files
     ];
+  };
+in
+  {
+    partition = partition;
+    contents = {
+      uboot = uboot;
+      boot_files = boot_files;
+    };
   }

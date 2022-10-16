@@ -24,8 +24,7 @@ let
       boot_mount
     ];
   };
-in
-  env.mkDerivation {
+  partition = env.mkDerivation {
     name = "rootfs-partition";
     buildInputs = [
       pkgs.coreutils
@@ -41,4 +40,11 @@ in
 
       cp -rn $rootfs/* $out/
     '';
+  };
+in
+  {
+    partition = partition;
+    contents = {
+      busybox = busybox;
+    };
   }

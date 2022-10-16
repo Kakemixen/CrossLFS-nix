@@ -31,7 +31,7 @@ let
     crossConfig = crossConfig;
   };
 
-  boot_partition = callPackage ./boot/derivation.nix {
+  bootfs = callPackage ./boot/derivation.nix {
     env = pkgs.gcc11Stdenv;
     toolchain = toolchain;
     crossConfig = crossConfig;
@@ -50,7 +50,7 @@ let
 
   crossEnv = pkgs.overrideCC crossEnvNoCc allCC;
 
-  rootfs_partition = callPackage ./rootfs/derivation.nix {
+  rootfs = callPackage ./rootfs/derivation.nix {
     env = crossEnv;
     toolchain = toolchain;
     crossConfig = crossConfig;
@@ -58,8 +58,8 @@ let
   };
 
   image = callPackage ./disk_img/derivation.nix {
-    bootfs = boot_partition;
-    rootfs = rootfs_partition;
+    bootfs = bootfs.partition;
+    rootfs = rootfs.partition;
   };
 in
   image
