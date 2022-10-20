@@ -82,6 +82,14 @@ let
     stdenvNoCC = crossEnvNoCC;
   };
 
+  files_for_target = callPackage ./for_target.nix {
+    mkDerivation = crossEnvNoCC.mkDerivation;
+    sources = sources;
+    crossConfig = crossConfig;
+    cc = gcc;
+    gcc_unwrapped = gcc_unwrapped;
+  };
+
   gmp = callPackage ./gmp.nix {
     sources = sources;
     binutils = binutils;
@@ -113,4 +121,5 @@ in
     gmp = gmp;
     mpc = mpc;
     mpfr = mpfr;
+    for_target = files_for_target;
   }
