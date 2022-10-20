@@ -34,8 +34,8 @@ in
       "installPhase"
     ];
     installPhase = ''
-      mkdir -p $out
-      ln -sf $src/lib $out/lib
+      mkdir -p $out/lib
+      ln -sf $src/lib/modules $out/lib/modules
     '';
   };
 }

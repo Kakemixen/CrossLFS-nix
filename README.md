@@ -36,3 +36,5 @@ It currently hangs after running the init-program, which is kinda sad.
  * When merging the rootfs to format the partitions with is, the nix web symlinks is difficult to work with.
   * Ended up creating a script to follow symlinks for links to `/nix/store`, as we want to keep the relative symlinks that will work on the system.
  * When creating binaries for the system, you may end up with the cross-compiled binaries shadowing binaries for your system.
+ * When joining symlinks, directory-links are not merged.
+  * So make sure all relevant diretories are "true" diretories, and only files are symlinked

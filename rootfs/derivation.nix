@@ -19,9 +19,10 @@ let
   symlinks = pkgs.symlinkJoin {
     name = "rootfs-partition-parts";
     paths = [
-      linux.kernel_lib
       busybox
       boot_mount
+      toolchain.for_target
+      linux.kernel_lib
     ];
   };
   partition = env.mkDerivation {
