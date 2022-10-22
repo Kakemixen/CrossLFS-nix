@@ -1,0 +1,16 @@
+# Use the Linux Kernel we compiled earlier.
+#upstream_kernel=1
+#kernel=zImage
+
+kernel=u-boot.bin
+
+# Enable UART so we can use a TTL cable.
+enable_uart=1
+uart_2ndstage=1
+
+#device_tree_address=0x02e00000
+
+# Use the appropriate DTB for our device.
+#device_tree=bcm2837-rpi-3-a-plus.dtb
+#device_tree=bcm2710-rpi-3-b-plus.dtb
+#device_tree=bcm2710-rpi-3-b.dtb
