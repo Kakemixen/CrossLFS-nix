@@ -13,10 +13,10 @@ The toolchain is built from source, it's nice to not have to think too much abou
 ### Pitfalls
 
  * Nix GCC wrapper by default adds several hardening flags. Of importance here is `-Wformat-security`, as one cannot compile GCC with that flag.
-  * the `hardeningDisable` derivation property can remove such flags, allowing to compile the compiler.
- * Setting up the nix wrapper with `wrapCCWith` doesn't work properly if the platforms is not set properly.
-  * the `override` functionality is nice here, so that we can use `stdenv` as a base.
-  * Without the wrapper, finding the required output of previous derivation requires very hacky hacks.
+   * the `hardeningDisable` derivation property can remove such flags, allowing to compile the compiler.
+ * Setting up the nix wrapper with `wrapCCWith` doesn't work properly if the platforms in the stdenv is not set properly.
+   * the `override` functionality is nice here, so that we can use `stdenv` as a base.
+   * Without the wrapper, finding the required output of previous derivation requires very hacky hacks.
  * Keeping in mind that one should be careful with subdirectories of `$out`, it impacts the generated nix path.
 
 ## Booting the kernel
@@ -34,7 +34,7 @@ It currently hangs after running the init-program, which is kinda sad.
 ### Pitfalls
 
  * When merging the rootfs to format the partitions with is, the nix web symlinks is difficult to work with.
-  * Ended up creating a script to follow symlinks for links to `/nix/store`, as we want to keep the relative symlinks that will work on the system.
+   * Ended up creating a script to follow symlinks for links to `/nix/store`, as we want to keep the relative symlinks that will work on the system.
  * When creating binaries for the system, you may end up with the cross-compiled binaries shadowing binaries for your system.
  * When joining symlinks, directory-links are not merged.
-  * So make sure all relevant diretories are "true" diretories, and only files are symlinked
+   * So make sure all relevant diretories are "true" diretories, and only files are symlinked
