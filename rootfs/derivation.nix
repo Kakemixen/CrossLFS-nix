@@ -23,6 +23,7 @@ let
       boot_mount
       toolchain.for_target
       linux.kernel_lib
+      ./files
     ];
   };
   partition = env.mkDerivation {

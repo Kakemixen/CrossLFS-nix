@@ -1,0 +1,5 @@
+# Begin /etc/hosts (no network card version)
+
+127.0.0.1 localhost
+
+# End /etc/hosts (no network card version)
