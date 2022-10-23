@@ -11,16 +11,10 @@ let
     sources = sources;
   };
 
-  boot_mount = env.mkDerivation {
-    name = "boot-mount";
-    phases = [ "installPhase" ];
-    installPhase = "mkdir -p $out/boot";
-  };
   symlinks = pkgs.symlinkJoin {
     name = "rootfs-partition-parts";
     paths = [
       busybox
-      boot_mount
       toolchain.for_target
       linux.kernel_lib
       ./files
