@@ -5,6 +5,20 @@ It is mainly for educational purposes, but the end goal is a usable system along
 
 This README talks about the different parts of the project, focusing on pitfalls I fell into. It also contains notes for myself, as long as the project is unfinished
 
+## HOWTO
+
+	nix-build -> flash SD-card -> UART root shell
+
+Generate the default output with `nix-build`. This builds a disk image (`.img`) that can be flashed to a storage medium, and booted from. 
+
+You can also specify other derivations with `nix-build -A debug.<derivation>`. There's probably a way to list the possible attributes, but I don't know of anything except reading the derivations.
+
+## Supported HW
+
+ * Raspberry pi 3 A+
+
+Currently, everything reladed to HW configs is hardcoded. Figuring out how to deal with this is something I'll get to eventually.
+
 ## Toolchain
 
 The toolchain is built from source, it's nice to not have to think too much about isolation from host OS.
@@ -24,7 +38,7 @@ The toolchain is built from source, it's nice to not have to think too much abou
 With a working toolchain, this was the easy part.
 There is currently not any customization.
 
-No initramfs, so it boots directly to the rootfs on the SDcard.
+No initramfs, so it boots directly to the rootfs on the SD-card.
 
 ## [WIP] Rootfs
 
