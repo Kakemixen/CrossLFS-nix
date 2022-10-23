@@ -23,8 +23,6 @@ let
 in
   {
     partition = partition;
-    contents = {
-      uboot = uboot;
-      boot_files = boot_files;
-    };
+    uboot = uboot;
+    boot_files = boot_files;
   }

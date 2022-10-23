@@ -62,4 +62,11 @@ let
     rootfs = rootfs.partition;
   };
 in
-  image
+  {
+    image = image;
+    debug = {
+      toolchain = toolchain;
+      bootfs = bootfs;
+      rootfs = rootfs;
+    };
+  }

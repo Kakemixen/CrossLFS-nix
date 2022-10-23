@@ -48,7 +48,5 @@ let
 in
   {
     partition = partition;
-    contents = {
-      busybox = busybox;
-    };
+    busybox = busybox;
   }
