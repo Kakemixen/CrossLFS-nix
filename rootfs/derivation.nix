@@ -35,8 +35,16 @@ let
     rootfs = symlinks;
     phases = [ "installPhase" ];
     installPhase = ''
+      # directory tree
       mkdir $out
+      mkdir -pv $out/{bin,boot,dev,etc,home,lib/{firmware,modules}}
+      mkdir -pv $out/{mnt,opt,proc,sbin,srv,sys}
+      mkdir -pv $out/var/{cache,lib,local,lock,log,opt,run,spool}
+      install -dv -m 0750 $out/root
+      install -dv -m 1777 $out/{var/,}tmp
+      mkdir -pv $out/usr/{,local/}{bin,include,lib,sbin,share,src}
 
+      # populate with files
       find $rootfs -type f,l \
       -exec ${./copy_rootfs.sh} {} $out \;
 
