@@ -2,7 +2,6 @@
 
 This repo is my attempt at CLFS using nix as a build system.
 It is mainly for educational purposes, but the end goal is a usable system along with a somewhat ergonomic environment for further development.
-This may or may not be of interest
 
 This README talks about the different parts of the project, focusing on pitfalls I fell into. It also contains notes for myself, as long as the project is unfinished
 
@@ -18,18 +17,21 @@ The toolchain is built from source, it's nice to not have to think too much abou
    * the `override` functionality is nice here, so that we can use `stdenv` as a base.
    * Without the wrapper, finding the required output of previous derivation requires very hacky hacks.
  * Keeping in mind that one should be careful with subdirectories of `$out`, it impacts the generated nix path.
+   * E.g. only derivations with an `$out/include` are included in the `NIX_CFLAGS_COMPILE` env-var, adding them to the include path.
 
 ## Booting the kernel
 
-Building didn't require an advanced nix toolchain, so was pretty OK.
+With a working toolchain, this was the easy part.
 There is currently not any customization.
 
-It is able to run the rootfs the rpi-images come with. Overriding the boot partition with these files work well.
-The debug led flashes, but everything seems OK?
+No initramfs, so it boots directly to the rootfs on the SDcard.
 
 ## [WIP] Rootfs
 
-It currently hangs after running the init-program, which is kinda sad.
+It runs the init-program just fine, the debug-led on the rpi3 blinks, but everything seems to work well, I'll deal with it later.
+
+Running the kernel with `init=/bin/sh` doesn't work, as the sysem seems to just hang. Could just be that it needs some initialization,
+which is done by the clfs bootscripts, so perhaps using an initramfs could solve this?
 
 ### Pitfalls
 
@@ -37,4 +39,4 @@ It currently hangs after running the init-program, which is kinda sad.
    * Ended up creating a script to follow symlinks for links to `/nix/store`, as we want to keep the relative symlinks that will work on the system.
  * When creating binaries for the system, you may end up with the cross-compiled binaries shadowing binaries for your system.
  * When joining symlinks, directory-links are not merged.
-   * So make sure all relevant diretories are "true" diretories, and only files are symlinked
+   * So make sure all relevant diretories are "true" diretories, and only files are symlinked.
