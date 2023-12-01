@@ -11,7 +11,6 @@ in
       sources.bootcode_bin
       sources.start_elf
       sources.fixup_dat
-      ./files/uboot.env
       ./files/config.txt
       ./files/cmdline.txt
     ];

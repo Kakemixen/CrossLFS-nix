@@ -4,6 +4,11 @@ env.mkDerivation rec {
 
   src = sources.uboot;
 
+  files = [
+    ./rpi/clfs_defconfig
+    ./rpi/clfs_env.env
+  ];
+
   phases = [
     "unpackPhase"
     "configurePhase"
@@ -14,6 +19,18 @@ env.mkDerivation rec {
   unpackPhase = ''
     tar xaf $src
     cd u-boot-*
+
+    cp $files .
+
+    # this only works because there is only one of each
+
+    mv *clfs_defconfig configs/clfs_defconfig
+    mv *.env board/raspberrypi/rpi/clfs_env.env
+
+    # remove conflicting define
+    sed -i '/#define CONFIG_EXTRA_ENV_SETTINGS/,+5d' \
+        include/configs/rpi.h
+
   '';
 
   arch = crossConfig.arch;
@@ -36,7 +53,7 @@ env.mkDerivation rec {
     export CROSS_COMPILE=${target}-
 
     # assume this works
-    make rpi_3_32b_defconfig
+    make clfs_defconfig
   '';
 
   buildPhase = ''
