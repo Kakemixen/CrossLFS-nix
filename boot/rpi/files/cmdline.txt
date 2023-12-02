@@ -1,2 +1,2 @@
-8250.nr_uarts=1 console=ttyS0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait
+8250.nr_uarts=1 console=ttyS0,115200 console=tty1 root=/dev/mmcblk0p4 rootfstype=ext4 rootwait
 

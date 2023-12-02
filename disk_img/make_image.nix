@@ -24,11 +24,19 @@ env.mkDerivation {
   coreutils=coreutils;
 
   buildPhase = ''
-    dd if=/dev/zero of=clfs.img bs=1k count=2000000
+    dd if=/dev/zero of=clfs.img bs=1k count=2800000
 
     parted --script clfs.img mklabel msdos
-    parted --script clfs.img mkpart primary fat32 1MiB 301MiB
-    parted --script clfs.img mkpart primary ext4 301MiB 100%
+
+    # partition for boot selector
+    parted --script clfs.img mkpart primary fat32    1MiB  301MiB
+
+    # partition for images, contains read-only fs?
+    parted --script clfs.img mkpart primary        301MiB 1301MiB
+    parted --script clfs.img mkpart primary       1301MiB 2301MiB
+
+    # partition for r/w filesystem
+    parted --script clfs.img mkpart primary ext4  2301MiB    100%
 
 
     extract_partition() {
@@ -68,10 +76,10 @@ env.mkDerivation {
     rm boot.part
 
     # rootfs
-    extract_partition clfs.img 2 rootfs.part
+    extract_partition clfs.img 4 rootfs.part
     mkdir rootfs
     mkfs.ext4 -F rootfs.part -d $rootfs
-    merge_partition clfs.img 2 rootfs.part
+    merge_partition clfs.img 4 rootfs.part
     rm rootfs.part
   '';
 
