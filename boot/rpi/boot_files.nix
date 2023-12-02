@@ -1,4 +1,4 @@
-{stdenv, fetchurl, callPackage}:
+{stdenv, fetchurl, callPackage, uboot_tools}:
 let
   sources = callPackage ./sources.nix {
     fetchurl = fetchurl;
@@ -13,20 +13,36 @@ in
       sources.fixup_dat
       ./files/config.txt
       ./files/cmdline.txt
+      ./files/boot.txt
     ];
 
     phases = [
+      "unpackPhase"
+      "buildPhase"
       "installPhase"
     ];
 
-    installPhase = ''
-      mkdir -p $out
+    nativeBuildInputs = [
+      uboot_tools
+    ];
+
+    unpackPhase = ''
       for src in $srcs
       do
         #get filename without nix hash
         name=$(echo $src | awk -F- '{ print $2}')
 
-        cp -v $src $out/$name
+        cp -v $src $name
       done
+    '';
+
+    buildPhase = ''
+      mkimage -T script -n 'CLFS script' -d boot.txt boot.scr
+      rm boot.txt
+    '';
+
+    installPhase = ''
+      mkdir -p $out
+      mv * $out
     '';
   }

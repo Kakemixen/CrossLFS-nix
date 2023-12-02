@@ -16,7 +16,9 @@ let
     crossConfig = crossConfig;
   };
 
-  boot_files = pkgs.callPackage ./rpi/boot_files.nix {};
+  boot_files = pkgs.callPackage ./rpi/boot_files.nix {
+    uboot_tools = uboot_tools;
+  };
 
   partition = pkgs.symlinkJoin {
     name = "boot-partition";
