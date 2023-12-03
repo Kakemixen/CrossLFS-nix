@@ -1,4 +1,4 @@
-{pkgs, env, toolchain, crossConfig, linux}:
+{pkgs, env, toolchain, crossConfig, linux, rootfs}:
 let
   sources = pkgs.callPackage ./sources.nix {
     fetchurl = pkgs.fetchurl;
@@ -20,12 +20,23 @@ let
     uboot_tools = uboot_tools;
   };
 
+  initramfs = pkgs.callPackage ./initramfs.nix {
+    env = env;
+    sources = sources;
+    toolchain = toolchain;
+    crossConfig = crossConfig;
+    linux_tools = linux.kernel_tools;
+    uboot_tools = uboot_tools;
+    rootfs = rootfs;
+  };
+
   partition = pkgs.symlinkJoin {
     name = "boot-partition";
     paths = [
       linux.kernel_boot
       uboot
       boot_files
+      initramfs
     ];
   };
 in
@@ -34,4 +45,5 @@ in
     uboot = uboot;
     uboot_tools = uboot_tools;
     boot_files = boot_files;
+    initramfs = initramfs;
   }

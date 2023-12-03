@@ -3,5 +3,6 @@ fatload mmc 0 ${cmdlineaddr} cmdline.txt
 setexpr.s bootargs *${cmdlineaddr}
 
 fatload mmc 0:1 ${kernel_addr_r} zImage
+fatload mmc 0:1 ${ramdisk_addr_r} initrd.img
 fatload mmc 0:1 ${fdt_addr} bcm2837-rpi-3-a-plus.dtb
-bootz ${kernel_addr_r} - ${fdt_addr}
+bootz ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr}

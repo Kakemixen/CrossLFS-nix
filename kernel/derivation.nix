@@ -38,4 +38,15 @@ in
       ln -sf $src/lib/modules $out/lib/modules
     '';
   };
+  kernel_tools = env.mkDerivation {
+    name = "linux-clfs-tools";
+    src = kernel;
+    phases = [
+      "installPhase"
+    ];
+    installPhase = ''
+      mkdir -p $out
+      ln -sf $src/bin $out/bin
+    '';
+  };
 }

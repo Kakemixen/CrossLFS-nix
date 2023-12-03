@@ -1,0 +1,19 @@
+#!/bin/busybox sh
+
+# Create utils links to busybox
+/bin/busybox --install -s /bin
+/bin/busybox --install -s /sbin
+
+# No init system, so we need to set up a few more mounts
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+
+# devfs required for getty
+mount -t devtmpfs none /dev
+
+# Just execute a shell
+echo SYSTEM BOOTED
+echo "Erling Linux"
+/bin/sh
+umount -a 2>/dev/null
+poweroff -f

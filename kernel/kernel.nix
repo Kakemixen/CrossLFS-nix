@@ -61,5 +61,8 @@ env.mkDerivation rec {
     cp -r arch/arm/boot/dts/bcm2837* $out/boot
 
     make INSTALL_MOD_PATH=$out modules_install
+
+    mkdir -p $out/bin
+    cp usr/gen_init* $out/bin
   '';
 }

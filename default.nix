@@ -31,13 +31,6 @@ let
     crossConfig = crossConfig;
   };
 
-  bootfs = callPackage ./boot/derivation.nix {
-    env = pkgs.gcc11Stdenv;
-    toolchain = toolchain;
-    crossConfig = crossConfig;
-    linux = linux;
-  };
-
   # We still need the hostCC
   # TODO build hostCC as well? - ensure same version
   allCC = pkgs.symlinkJoin {
@@ -55,6 +48,14 @@ let
     toolchain = toolchain;
     crossConfig = crossConfig;
     linux = linux;
+  };
+
+  bootfs = callPackage ./boot/derivation.nix {
+    env = pkgs.gcc11Stdenv;
+    toolchain = toolchain;
+    crossConfig = crossConfig;
+    linux = linux;
+    rootfs = rootfs;
   };
 
   image = callPackage ./disk_img/derivation.nix {
