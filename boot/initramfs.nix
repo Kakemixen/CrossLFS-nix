@@ -17,6 +17,8 @@ env.mkDerivation rec {
     dir /root 0700 0 0
     dir /sbin 0755 0 0
     dir /bin 0755 0 0
+    dir /proc 0755 0 0
+    dir /sys 0755 0 0
     file /bin/busybox ${rootfs.busybox}/bin/busybox 0755 0 0
     file /init ${init} 0755 0 0
   '';

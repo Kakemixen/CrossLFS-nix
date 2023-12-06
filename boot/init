@@ -1,19 +1,68 @@
 #!/bin/busybox sh
 
-# Create utils links to busybox
+# Function for dropping to a shell
+shell () {
+	echo ''
+	echo '	Entering rescue shell.'
+	echo '	Type rootdev root_device to set device to boot.'
+	echo '	   ex: rootdev /dev/sda1'
+	echo '	Exit shell to continue booting.'
+	exec /bin/busybox sh
+}
+
+echo "Creating busybox symlinks"
 /bin/busybox --install -s /bin
 /bin/busybox --install -s /sbin
 
+# Ensure that basic directories exist
+for dir in /proc /sys /dev
+do
+	[ -d $dir ] || $MKDIR $dir
+done
+
 # No init system, so we need to set up a few more mounts
+echo "mount /proc"
 mount -t proc proc /proc
+echo "mount /sys"
 mount -t sysfs sysfs /sys
 
 # devfs required for getty
+echo "mount /dev"
 mount -t devtmpfs none /dev
 
-# Just execute a shell
-echo SYSTEM BOOTED
-echo "Erling Linux"
-/bin/sh
-umount -a 2>/dev/null
-poweroff -f
+# Drop to shell if "shell" was passed as kernel param
+/bin/grep -q 'shell' /proc/cmdline && shell
+
+echo "mounting root squashfs"
+mkdir /newroot
+
+mkdir /mnt
+if ! mount /dev/mmcblk0p4 /mnt
+then
+	shell
+fi
+
+if ! mount /mnt/root.sqsh /newroot -t squashfs -o loop
+then
+	shell
+fi
+
+if ! mount --move /mnt /newroot/mnt
+then
+	shell
+fi
+
+echo "moving mounts"
+mount --move /sys /newroot/sys
+mount --move /proc /newroot/proc
+mount --move /dev /newroot/dev
+
+echo "Executing switch_root and spawning init"
+if ! exec switch_root /newroot /sbin/init
+then
+	echo ""
+	echo "Couldn't switch_root"
+	$MOUNT -t proc proc /proc
+	echo "Couldn't switch_root"
+	exec /bin/busybox sh
+fi
