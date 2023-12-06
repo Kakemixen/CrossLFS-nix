@@ -20,33 +20,44 @@ let
       ./files
     ];
   };
-  partition = env.mkDerivation {
+  squashfs = env.mkDerivation {
     name = "rootfs-partition";
     buildInputs = [
       pkgs.coreutils
       pkgs.bash
+      pkgs.squashfsTools
     ];
     rootfs = symlinks;
-    phases = [ "installPhase" ];
-    installPhase = ''
+    phases = [
+      "buildPhase"
+      "installPhase"
+    ];
+    buildPhase = ''
       # directory tree
-      mkdir $out
-      mkdir -pv $out/{bin,boot,dev,etc,home,lib/{firmware,modules}}
-      mkdir -pv $out/{mnt,opt,proc,sbin,srv,sys}
-      mkdir -pv $out/var/{cache,lib,local,lock,log,opt,run,spool}
-      install -dv -m 0750 $out/root
-      install -dv -m 1777 $out/{var/,}tmp
-      mkdir -pv $out/usr/{,local/}{bin,include,lib,sbin,share,src}
+      mkdir root
+      mkdir -pv root/{bin,boot,dev,etc,home,lib/{firmware,modules}}
+      mkdir -pv root/{mnt,opt,proc,sbin,srv,sys}
+      mkdir -pv root/var/{cache,lib,local,lock,log,opt,run,spool}
+      install -dv -m 0750 root/root
+      install -dv -m 1777 root/{var/,}tmp
+      mkdir -pv root/usr/{,local/}{bin,include,lib,sbin,share,src}
 
       # populate with files
       find $rootfs -type f,l \
-      -exec ${./copy_rootfs.sh} {} $out \;
+      -exec ${./copy_rootfs.sh} {} root \;
 
-      cp -rn $rootfs/* $out/
+      echo HERE
+      cp -rnv $rootfs/* root/
+
+      mksquashfs root/ root.sqsh
+    '';
+    installPhase = ''
+      mkdir $out
+      mv root.sqsh $out/
     '';
   };
 in
   {
-    partition = partition;
+    squashfs = squashfs;
     busybox = busybox;
   }

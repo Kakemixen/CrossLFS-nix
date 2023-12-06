@@ -60,7 +60,7 @@ let
 
   image = callPackage ./disk_img/derivation.nix {
     bootfs = bootfs.partition;
-    rootfs = rootfs.partition;
+    rootfs = rootfs.squashfs;
   };
 in
   {
