@@ -17,6 +17,7 @@ in
     crossConfig = crossConfig;
     rsync = pkgs.rsync;
   };
+  kernel = kernel;
   kernel_boot = env.mkDerivation {
     name = "linux-clfs-boot";
     src = kernel;

@@ -67,6 +67,7 @@ in
     image = image;
     debug = {
       toolchain = toolchain;
+      linux = linux;
       bootfs = bootfs;
       rootfs = rootfs;
     };
