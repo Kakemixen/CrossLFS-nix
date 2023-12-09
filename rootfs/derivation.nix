@@ -3,6 +3,7 @@ let
   sources = pkgs.callPackage ./sources.nix {
     fetchurl = pkgs.fetchurl;
   };
+
   busybox = pkgs.callPackage ./busybox.nix {
     env = env;
     toolchain = toolchain;
@@ -11,15 +12,22 @@ let
     sources = sources;
   };
 
+  iana_etc = pkgs.callPackage ./iana_etc.nix {
+    env = env;
+    sources = sources;
+  };
+
   symlinks = pkgs.symlinkJoin {
     name = "rootfs-partition-parts";
     paths = [
       busybox
+      iana_etc
       toolchain.for_target
       linux.kernel_lib
       ./files
     ];
   };
+
   squashfs = env.mkDerivation {
     name = "rootfs-partition";
     buildInputs = [
@@ -60,4 +68,5 @@ in
   {
     squashfs = squashfs;
     busybox = busybox;
+    iana_etc = iana_etc;
   }
