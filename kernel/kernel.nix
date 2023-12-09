@@ -4,6 +4,7 @@ env.mkDerivation rec {
   name = "linux-clfs";
 
   src = sources.linux;
+  defconfig = ./clfs_defconfig;
 
   phases = [
     "unpackPhase"
@@ -27,6 +28,10 @@ env.mkDerivation rec {
     pkgs.libyaml
   ];
 
+  nativeBuildInputs = [
+    pkgs.ncurses
+  ];
+
   unpackPhase = ''
     tar xaf $src
     cd linux-*
@@ -44,7 +49,9 @@ env.mkDerivation rec {
     export ARCH=${arch}
     export CROSS_COMPILE=${target}-
 
-    make multi_v7_defconfig
+
+    cp ${defconfig} arch/arm/configs/clfs_defconfig
+    make clfs_defconfig
   '';
 
   buildPhase = ''
