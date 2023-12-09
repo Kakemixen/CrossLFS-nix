@@ -34,20 +34,35 @@ mount -t devtmpfs none /dev
 /bin/grep -q 'shell' /proc/cmdline && shell
 
 echo "mounting root squashfs"
+
+mkdir -p /mnt/base
+if ! mount /dev/mmcblk0p4 /mnt/base
+then
+	shell
+fi
+
+mkdir /lower
+if ! mount /mnt/base/root.sqsh /lower -t squashfs -o loop
+then
+	shell
+fi
+
+mkdir /overlay
+if ! mount -t tmpfs tmpfs /overlay
+then
+	shell
+fi
+
 mkdir /newroot
-
-mkdir /mnt
-if ! mount /dev/mmcblk0p4 /mnt
+mkdir -p /overlay/upper
+mkdir -p /overlay/work
+if ! mount -t overlay overlay -olowerdir=/lower,upperdir=/overlay/upper,workdir=/overlay/work /newroot
 then
 	shell
 fi
 
-if ! mount /mnt/root.sqsh /newroot -t squashfs -o loop
-then
-	shell
-fi
-
-if ! mount --move /mnt /newroot/mnt
+mkdir -p /newroot/mnt/base
+if ! mount --move /mnt/base /newroot/mnt/base
 then
 	shell
 fi
