@@ -25,12 +25,21 @@ let
     sources = sources;
   };
 
+  netplug = pkgs.callPackage ./netplug/derivation.nix {
+    env = env;
+    toolchain = toolchain;
+    crossConfig = crossConfig;
+    linux-headers = linux.headers;
+    sources = sources;
+  };
+
   symlinks = pkgs.symlinkJoin {
     name = "rootfs-partition-parts";
     paths = [
       busybox
       iana_etc
       zlib
+      netplug
       toolchain.for_target
       linux.kernel_lib
       ./files
@@ -79,4 +88,5 @@ in
     busybox = busybox;
     iana_etc = iana_etc;
     zlib = zlib;
+    netplug = netplug;
   }

@@ -17,4 +17,10 @@ rec {
     url = "https://www.zlib.net/zlib-${zlib_version}.tar.gz";
     sha256 = "0gjrz8p70mgkic7mxjh1vqwws4x8z7hq2fhbackvqg81jb1a82zz";
   };
+
+  netplug_version = "1.2.9.2";
+  netplug = fetchurl {
+    url = "https://www.red-bean.com/~bos/netplug/netplug-${netplug_version}.tar.bz2";
+    sha256 = "0kl62h4bj8s4sn5x8g414d3ad9j53gq082kv08x67l6klzcxz02i";
+  };
 }
