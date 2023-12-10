@@ -11,4 +11,10 @@ rec {
     url = "https://github.com/Mic92/iana-etc/releases/download/${iana_etc_version}/iana-etc-${iana_etc_version}.tar.gz";
     sha256 = "18dglj4zd21mxbvmn7yrh8yqb77qfsixlv6qapgr10zjw20n8vvy";
   };
+
+  zlib_version = "1.3";
+  zlib = fetchurl {
+    url = "https://www.zlib.net/zlib-${zlib_version}.tar.gz";
+    sha256 = "0gjrz8p70mgkic7mxjh1vqwws4x8z7hq2fhbackvqg81jb1a82zz";
+  };
 }

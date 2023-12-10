@@ -17,11 +17,20 @@ let
     sources = sources;
   };
 
+  zlib = pkgs.callPackage ./zlib.nix {
+    env = env;
+    toolchain = toolchain;
+    crossConfig = crossConfig;
+    linux-headers = linux.headers;
+    sources = sources;
+  };
+
   symlinks = pkgs.symlinkJoin {
     name = "rootfs-partition-parts";
     paths = [
       busybox
       iana_etc
+      zlib
       toolchain.for_target
       linux.kernel_lib
       ./files
@@ -69,4 +78,5 @@ in
     squashfs = squashfs;
     busybox = busybox;
     iana_etc = iana_etc;
+    zlib = zlib;
   }
