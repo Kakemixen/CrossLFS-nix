@@ -18,6 +18,12 @@ rec {
     sha256 = "0gjrz8p70mgkic7mxjh1vqwws4x8z7hq2fhbackvqg81jb1a82zz";
   };
 
+  dropbear_version = "2022.83";
+  dropbear = fetchurl {
+    url = "https://matt.ucc.asn.au/dropbear/releases/dropbear-${dropbear_version}.tar.bz2";
+    sha256 = "0fs495ks354qcfj4k5bwg6m50vbl8az03gjymmqm2jy9zcgi4nmw";
+  };
+
   netplug_version = "1.2.9.2";
   netplug = fetchurl {
     url = "https://www.red-bean.com/~bos/netplug/netplug-${netplug_version}.tar.bz2";

@@ -33,6 +33,15 @@ let
     sources = sources;
   };
 
+  dropbear = pkgs.callPackage ./dropbear/derivation.nix {
+    env = env;
+    toolchain = toolchain;
+    crossConfig = crossConfig;
+    linux-headers = linux.headers;
+    zlib = zlib;
+    sources = sources;
+  };
+
   symlinks = pkgs.symlinkJoin {
     name = "rootfs-partition-parts";
     paths = [
@@ -40,6 +49,7 @@ let
       iana_etc
       zlib
       netplug
+      dropbear
       toolchain.for_target
       linux.kernel_lib
       ./files
@@ -89,4 +99,5 @@ in
     iana_etc = iana_etc;
     zlib = zlib;
     netplug = netplug;
+    dropbear = dropbear;
   }
