@@ -29,4 +29,10 @@ rec {
     url = "https://www.red-bean.com/~bos/netplug/netplug-${netplug_version}.tar.bz2";
     sha256 = "0kl62h4bj8s4sn5x8g414d3ad9j53gq082kv08x67l6klzcxz02i";
   };
+
+  wireless_tools_version = "29";
+  wireless_tools = fetchurl {
+    url = "https://hewlettpackard.github.io/wireless-tools/wireless_tools.${wireless_tools_version}.tar.gz";
+    sha256 = "18g5wa3rih89i776nc2n2s50gcds4611gi723h9ki190zqshkf3g";
+  };
 }

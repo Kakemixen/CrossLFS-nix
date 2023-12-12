@@ -42,6 +42,16 @@ let
     sources = sources;
   };
 
+  wireless_tools = pkgs.callPackage ./wireless_tools.nix {
+    env = env;
+    toolchain = toolchain;
+    crossConfig = crossConfig;
+    linux-headers = linux.headers;
+    zlib = zlib;
+    sources = sources;
+  };
+
+
   symlinks = pkgs.symlinkJoin {
     name = "rootfs-partition-parts";
     paths = [
@@ -50,6 +60,7 @@ let
       zlib
       netplug
       dropbear
+      wireless_tools
       toolchain.for_target
       linux.kernel_lib
       ./files
@@ -100,4 +111,5 @@ in
     zlib = zlib;
     netplug = netplug;
     dropbear = dropbear;
+    wireless_tools = wireless_tools;
   }
