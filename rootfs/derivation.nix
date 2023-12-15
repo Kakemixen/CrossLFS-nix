@@ -88,6 +88,7 @@ let
       install -dv -m 0750 root/root
       install -dv -m 1777 root/{var/,}tmp
       mkdir -pv root/usr/{,local/}{bin,include,lib,sbin,share,src}
+      ln -s /lib/ld-musl-armhf.so.1 root/usr/lib/ld.so.1
 
       # populate with files
       find $rootfs -type f,l \
