@@ -1,4 +1,4 @@
-{env, sources, toolchain, crossConfig, linux-headers}:
+{env, sources, toolchain, crossConfig, hostcc, linux-headers}:
 
 env.mkDerivation rec {
   name = "busybox";
@@ -18,6 +18,10 @@ env.mkDerivation rec {
     toolchain.mpc
     toolchain.mpfr
     linux-headers
+  ];
+
+  nativeBuildInputs = [
+    hostcc
   ];
 
   unpackPhase = ''

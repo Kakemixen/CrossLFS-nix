@@ -1,4 +1,4 @@
-{pkgs, env, toolchain, crossConfig, linux}:
+{pkgs, env, toolchain, crossConfig, hostcc, linux}:
 let
   sources = pkgs.callPackage ./sources.nix {
     fetchurl = pkgs.fetchurl;
@@ -10,6 +10,7 @@ let
     crossConfig = crossConfig;
     linux-headers = linux.headers;
     sources = sources;
+    hostcc = hostcc;
   };
 
   iana_etc = pkgs.callPackage ./iana_etc.nix {

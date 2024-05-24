@@ -41,13 +41,15 @@ let
     ];
   };
 
-  crossEnv = pkgs.overrideCC crossEnvNoCc allCC;
+  #crossEnv = pkgs.overrideCC crossEnvNoCc allCC;
+  crossEnv = pkgs.overrideCC crossEnvNoCc toolchain.gcc;
 
   rootfs = callPackage ./rootfs/derivation.nix {
     env = crossEnv;
     toolchain = toolchain;
     crossConfig = crossConfig;
     linux = linux;
+    hostcc = pkgs.gcc11Stdenv.cc;
   };
 
   bootfs = callPackage ./boot/derivation.nix {
