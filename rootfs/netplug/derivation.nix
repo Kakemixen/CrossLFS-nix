@@ -33,7 +33,15 @@ env.mkDerivation rec {
   target = crossConfig.target;
 
   configurePhase = ''
-    export CC=${target}-gcc
+    export CC="${target}-gcc --sysroot=${toolchain.sysroot}/${target}"
+    export CXX="${target}-g++ --sysroot=${toolchain.sysroot}/${target}"
+    export AR="${target}-ar"
+    export AS="${target}-as"
+    export LD="${target}-ld --sysroot=${toolchain.sysroot}/${target}"
+    export RANLIB="${target}-ranlib"
+    export READELF="${target}-readelf"
+    export STRIP="${target}-strip"
+
 
     for patch in $patches
     do
