@@ -12,19 +12,19 @@ case "$1" in
 start)
 	if [ ! -r "$DSSKEY" ]; then
 		echo -n "Generating DSS host key: "
-		dropbearkey -t dss -f "$DSSKEY" >/dev/null 2>&1
+		/usr/bin/dropbearkey -t dss -f "$DSSKEY" >/dev/null 2>&1
 		check_status
 	fi
 	if [ ! -r "$RSAKEY" ]; then
 		echo -n "Generating RSA host key: "
-		dropbearkey -t rsa -f "$RSAKEY" >/dev/null 2>&1
+		/usr/bin/dropbearkey -t rsa -f "$RSAKEY" >/dev/null 2>&1
 		check_status
 	fi
 	if [ -r "$PIDFILE" ]; then
 		echo "Service dropbear already running."
 	else
 		echo -n "Starting SSH server: "
-		dropbear
+		/usr/sbin/dropbear
 		check_status
 	fi
 	;;

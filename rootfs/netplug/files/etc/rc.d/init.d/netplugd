@@ -7,7 +7,7 @@
 case "$1" in
 start)
 	echo -n "Starting netplugd: "
-	netplugd
+	/sbin/netplugd
 	check_status
 	;;
 stop)

@@ -1,0 +1,3 @@
+auto wlan0
+auto wifi0
+iface wlan0 wifi0 inet dhcp
