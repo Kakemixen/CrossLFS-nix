@@ -6,7 +6,7 @@ rec {
   gmp_version="gmp-6.2.1";
   mpc_version="mpc-1.2.1";
   musl_version = "musl-1.2.2";
-  glibc_version = "2.39";
+  glibc_version = "2.40";
 
   binutils = fetchurl {
     url = "http://ftp.gnu.org/gnu/binutils/${binutils_version}.tar.xz";
@@ -34,6 +34,6 @@ rec {
   };
   glibc = fetchurl {
     url = "https://gnuftp.uib.no/glibc/glibc-${glibc_version}.tar.xz";
-    sha256 = "09nrwb0ksbah9k35jchd28xxp2hidilqdgz7b8v5f30pz1yd8yzp";
+    sha256 = "18h50b0zm8dkpzj81w033v99rbxiykk3v697yr4dfqwjbqbr1a0r";
   };
 }
