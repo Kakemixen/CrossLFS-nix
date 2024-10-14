@@ -34,6 +34,8 @@ mkDerivation rec {
     #patch -Np1 -i ../glibc-2.39-fhs-1.patch
     echo "rootsbindir=/usr/sbin" > configparms
 
+    sed -i '3466s/test $ac_status = 0; }/if test $ac_status = 0; then break; fi; }/' ../configure
+
     TARGET=${target} \
     BUILD_CC="gcc" CC="${target}-gcc" \
     AR="${target}-ar" RANLIB="${target}-ranlib" \
