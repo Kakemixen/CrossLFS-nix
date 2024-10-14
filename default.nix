@@ -3,14 +3,14 @@ let
     float="hard";
     fpu="vfp";
     host="x86_64-cross-linux-gnu";
-    target="arm-linux-musleabihf";
+    target="arm-linux-gnueabihf";
     arch="arm";
     endian="little";
     arm_arch="armv6zk";
   };
   myTargetPlatform = {
       config = crossConfig.target;
-      libc = "musl";
+      libc = "glibc";
     };
   myTargetPlatformElab = pkgs.lib.systems.elaborate myTargetPlatform;
   crossEnvNoCc = pkgs.stdenvNoCC.override {
@@ -23,6 +23,7 @@ let
 
   toolchain = callPackage ./toolchain/derivation.nix {
     crossConfig = crossConfig;
+    targetPlatform = myTargetPlatform;
   };
 
   linux = callPackage ./kernel/derivation.nix {

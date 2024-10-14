@@ -1,4 +1,4 @@
-{pkgs, crossConfig}:
+{pkgs, crossConfig, targetPlatform}:
 
 let
   sources = callPackage ./sources.nix {
@@ -9,11 +9,7 @@ let
   noCCEnv = pkgs.stdenvNoCC;
   callPackage = pkgs.callPackage;
 
-  myTargetPlatform = {
-      config = crossConfig.target;
-      libc = "musl";
-    };
-  myTargetPlatformElab = pkgs.lib.systems.elaborate myTargetPlatform;
+  myTargetPlatformElab = pkgs.lib.systems.elaborate targetPlatform;
   crossEnvNoCC = pkgs.stdenvNoCC.override {
     targetPlatform = myTargetPlatformElab;
   };
@@ -56,17 +52,26 @@ let
     crossConfig = crossConfig;
     mkDerivation = crossEnvNoCC.mkDerivation;
   };
+  glibc = callPackage ./glibc.nix {
+    sources = sources;
+    gcc = gcc_static;
+    binutils = binutils_nolib;
+    crossConfig = crossConfig;
+    mkDerivation = crossEnvNoCC.mkDerivation;
+    #mkDerivation = CCEnv.mkDerivation;
+  };
+  libc = if targetPlatform.libc == "musl" then musl else glibc;
 
   binutils = pkgs.wrapBintoolsWith {
     name = "binutils-wrapped";
     bintools = binutils_unwrapped;
-    libc = musl;
+    libc = libc;
     stdenvNoCC = crossEnvNoCC;
   };
 
   sysroot = pkgs.symlinkJoin {
     name = "sysroot-cross-toolchain";
-    paths = [ usr-symlink musl binutils ];
+    paths = [ usr-symlink libc binutils ];
   };
   gcc_unwrapped = callPackage ./gcc.nix {
     sources = sources;
@@ -117,6 +122,8 @@ in
     sysroot = sysroot;
     binutils = binutils;
     musl = musl;
+    glibc = glibc;
+    libc = libc;
     gcc = gcc;
     gmp = gmp;
     mpc = mpc;
