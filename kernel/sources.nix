@@ -1,9 +1,11 @@
 {fetchurl}:
 rec {
-  linux_version="linux-5.19.7";
+  linux_version="linux-stable_20240423";
 
-  linux = fetchurl {
-    url = "https://mirrors.edge.kernel.org/pub/linux/kernel/v5.x/${linux_version}.tar.gz";
-    sha256 = "0vqzr7v9zw4k34cf5wqzi96xgjzxwm36bmdjivhg8p5yfy5ml3cr";
+  linux = builtins.fetchGit {
+    url = "https://github.com/raspberrypi/linux.git";
+    name = "rpi-linux";
+    ref = "rpi-6.6.y";
+    rev = "dda83b1";
   };
 }
