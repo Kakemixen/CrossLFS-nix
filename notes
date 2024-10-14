@@ -1,0 +1,243 @@
+fdisk official flash
+
+Disk /dev/sdd: 14.84 GiB, 15931539456 bytes, 31116288 sectors
+Disk model: SD/MMC
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x9730496b
+
+Device     Boot  Start     End Sectors  Size Id Type
+/dev/sdd1         8192  532479  524288  256M  c W95 FAT32 (LBA)
+/dev/sdd2       532480 3661823 3129344  1.5G 83 Linux
+
+Working configuration:
+	U-Boot> echo ${kernel_addr_r}
+	0x00080000
+	U-Boot> fatload mmc 0:1 ${kernel_addr_r} zImage
+	10158592 bytes read in 435 ms (22.3 MiB/s)
+	U-Boot> fatload mmc 0:1 ${fdt_addr} bcm2837-rpi-3-a-plus.dtb
+	14818 bytes read in 5 ms (2.8 MiB/s)
+	U-Boot> setenv bootargs 8250.nr_uarts=1 console=ttyS0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 init=/bin/sh rootwait
+	U-Boot> bootz ${kernel_addr_r} - ${fdt_addr}
+	Kernel image @ 0x080000 [ 0x000000 - 0x9b0200 ]
+	## Flattened Device Tree blob at 1bfe8a00
+	   Booting using the fdt blob at 0x1bfe8a00
+	   Using Device Tree in place at 1bfe8a00, end 1bfef3e1
+
+	Starting kernel ...
+
+	[    0.000000] Booting Linux on physical CPU 0x0
+
+cmds:
+fatload mmc 0:1 ${kernel_addr_r} zImage
+fatload mmc 0:1 ${fdt_addr} bcm2837-rpi-3-a-plus.dtb
+setenv bootargs 8250.nr_uarts=1 console=ttyS0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 init=/bin/sh rootwait
+bootz ${kernel_addr_r} - ${fdt_addr}
+
+when /sbin/init -> /lib/systemd/systemd
+[   14.282640] systemd[1]: Condition check resulted in Arbitrary Executable File Formats File System Automount Point being ski.
+[   14.297234] systemd[1]: Listening on Syslog Socket.
+[   14.305666] systemd[1]: Created slice system-serial\x2dgetty.slice.
+[   14.314893] systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+[   14.349443] systemd[1]: Condition check resulted in Journal Audit Socket being skipped.
+[   14.361407] systemd[1]: Listening on Journal Socket.
+[   14.370611] systemd[1]: Condition check resulted in Huge Pages File System being skipped.
+[   14.390397] systemd[1]: Starting Set the console keyboard layout...
+[   14.402242] systemd[1]: Starting Restore / save the current clock...
+[   14.414305] systemd[1]: Mounting RPC Pipe File System...
+
+
+when /sbin/init -> /bin/sh:
+[    3.562335] Run /sbin/init as init process
+Could be problem with opening serial or something?
+Or just that the shell is a corrupt binary?
+I dunno...
+
+let's just start with creating a proper image with
+ - include all config files in nix
+ - verify boot when mnt/boot == result/boot
+ - minimal rootfs
+ - creati image file for dd purposes
+
+nix:
+❯ nix repl
+Welcome to Nix 2.6.0. Type :? for help.
+
+nix-repl> func = { a, b, c }: a*b + c
+
+nix-repl> func { a=1; b=2; c=3; }
+5
+
+nix-repl> wrapper = { c, ... } @extraArgs : func (let self = { c=c; b=2; } // extraArgs; in self)
+
+nix-repl> wrapper
+«lambda @ (string):1:2»
+
+nix-repl> wrapper { c=1; }
+error: anonymous function at (string):1:2 called without required argument 'a'
+
+nix-repl> wrapper { c=1; a=2; }
+5
+
+nix-repl> wrapper { c=3; a=2; }
+7
+
+nix-repl>
+
+#### nix crossCC ####
+
+nix standard cross
+/nix/store/xpw33i0k5zbqlbbmac3bl2wsawn2j9rw-aarch64-unknown-linux-musl-stage-final-gcc-debug-wrapper-9.3.0/bin/aarch64-unknown-linux-musl-ld
+❯ ls /nix/store/xpw33i0k5zbqlbbmac3bl2wsawn2j9rw-aarch64-unknown-linux-musl-stage-final-gcc-debug-wrapper-9.3.0/bin -l
+total 40
+lrwxrwxrwx 1 root root  128 Jan  1  1970 aarch64-unknown-linux-musl-as -> /nix/store/dzi7bnki3b2z63gidl550b8phwx8370l-aarch64-unknown-linux-musl-binutils-wrapper-2.35.1/bin/aarch64-unknown-linux-musl-as
+lrwxrwxrwx 1 root root   30 Jan  1  1970 aarch64-unknown-linux-musl-c++ -> aarch64-unknown-linux-musl-g++
+lrwxrwxrwx 1 root root   30 Jan  1  1970 aarch64-unknown-linux-musl-cc -> aarch64-unknown-linux-musl-gcc
+-r-xr-xr-x 1 root root 8071 Jan  1  1970 aarch64-unknown-linux-musl-g++ : ASCII
+-r-xr-xr-x 1 root root 8071 Jan  1  1970 aarch64-unknown-linux-musl-gcc : ASCII
+lrwxrwxrwx 1 root root  128 Jan  1  1970 aarch64-unknown-linux-musl-ld -> /nix/store/dzi7bnki3b2z63gidl550b8phwx8370l-aarch64-unknown-linux-musl-binutils-wrapper-2.35.1/bin/aarch64-unknown-linux-musl-ld
+lrwxrwxrwx 1 root root  132 Jan  1  1970 aarch64-unknown-linux-musl-ld.bfd -> /nix/store/dzi7bnki3b2z63gidl550b8phwx8370l-aarch64-unknown-linux-musl-binutils-wrapper-2.35.1/bin/aarch64-unknown-linux-musl-ld.bfd
+lrwxrwxrwx 1 root root  133 Jan  1  1970 aarch64-unknown-linux-musl-ld.gold -> /nix/store/dzi7bnki3b2z63gidl550b8phwx8370l-aarch64-unknown-linux-musl-binutils-wrapper-2.35.1/bin/aarch64-unknown-linux-musl-ld.gold
+
+binutils_wrapped: /nix/store/dzi7bnki3b2z63gidl550b8phwx8370l-aarch64-unknown-linux-musl-binutils-wrapper-2.35.1/bin
+binutils_unwrapped: /nix/store/78q2kn9320sk25hjgbgjpakz7kw7w47g-aarch64-unknown-linux-musl-binutils-2.35.1/bin
+
+[nix-shell:/tmp/nix-build/musl-1.2.2]$
+
+my cross
+/nix/store/pxgsm3xhxxr25i7flvrflk39rhjvv9yh-arm-linux-musleabihf-crossCC-esl-/bin/arm-linux-musleabihf-gcc
+❯ ls /nix/store/pxgsm3xhxxr25i7flvrflk39rhjvv9yh-arm-linux-musleabihf-crossCC-esl-/bin -l
+total 24
+lrwxrwxrwx 1 root root  110 Jan  1  1970 arm-linux-musleabihf-as -> /nix/store/aqd7cp2xpqqwkp5lawvx9id22v2mlgqc-arm-linux-musleabihf-binutils-wrapper-/bin/arm-linux-musleabihf-as
+lrwxrwxrwx 1 root root   24 Jan  1  1970 arm-linux-musleabihf-cc -> arm-linux-musleabihf-gcc
+-r-xr-xr-x 1 root root 7576 Jan  1  1970 arm-linux-musleabihf-gcc
+lrwxrwxrwx 1 root root  110 Jan  1  1970 arm-linux-musleabihf-ld -> /nix/store/aqd7cp2xpqqwkp5lawvx9id22v2mlgqc-arm-linux-musleabihf-binutils-wrapper-/bin/arm-linux-musleabihf-ld
+lrwxrwxrwx 1 root root  114 Jan  1  1970 arm-linux-musleabihf-ld.bfd -> /nix/store/aqd7cp2xpqqwkp5lawvx9id22v2mlgqc-arm-linux-musleabihf-binutils-wrapper-/bin/arm-linux-musleabihf-ld.bfd
+
+binutils_unwrapped: /nix/store/08a6fkhbssyxdj1qzzkyr6r0j5bkfn70-binutils/bin
+
+ENV vars is the difference
+	I don't have AS,LD,CC, but the standard cross does
+
+
+latest error:
+[    3.560296] Run /bin/sh as init process
+[    3.575551] Kernel panic - not syncing: Requested init /bin/sh failed (error -2).
+
+
+
+network issues
+
+/root # modprobe cfg80211
+[ 1838.321442] 8<--- cut here ---
+[ 1838.325651] Unable to handle kernel NULL pointer dereference at virtual address 00000008
+[ 1838.336091] [00000008] *pgd=0360f835, *pte=00000000, *ppte=00000000
+[ 1838.343577] Internal error: Oops: 17 [#1] SMP ARM
+[ 1838.349440] Modules linked in: cfg80211(+)
+[ 1838.354656] CPU: 2 PID: 252 Comm: modprobe Not tainted 5.19.7 #1
+[ 1838.361804] Hardware name: BCM2835
+[ 1838.366321] PC is at event_create_dir+0x214/0x4f8
+[ 1838.372162] LR is at event_create_dir+0x21c/0x4f8
+[ 1838.377938] pc : [<c040f400>]    lr : [<c040f408>]    psr: 20000013
+[ 1838.385314] sp : dcf09dc8  ip : c245b5a0  fp : c1a8fe48
+[ 1838.391633] r10: bf07c7d4  r9 : c2888110  r8 : c1a8feec
+[ 1838.397943] r7 : c245b570  r6 : bf05fd80  r5 : bf07620c  r4 : c235a840
+[ 1838.405574] r3 : 00000000  r2 : 00000063  r1 : bf05fd80  r0 : 00000001
+[ 1838.413205] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+[ 1838.421472] Control: 10c5383d  Table: 0356c06a  DAC: 00000051
+[ 1838.428335] Register r0 information: non-paged memory
+[ 1838.434520] Register r1 information: 141-page vmalloc region starting at 0xbf000000 allocate8
+[ 1838.447768] Register r2 information: non-paged memory
+[ 1838.453949] Register r3 information: NULL pointer
+[ 1838.459723] Register r4 information: slab kmalloc-128 start c235a800 pointer offset 64 size 8
+[ 1838.470582] Register r5 information: 141-page vmalloc region starting at 0xbf000000 allocate8
+[ 1838.483797] Register r6 information: 141-page vmalloc region starting at 0xbf000000 allocate8
+[ 1838.497042] Register r7 information: slab trace_event_file start c245b570 pointer offset 0
+[ 1838.507561] Register r8 information: non-slab/vmalloc memory
+[ 1838.514397] Register r9 information: slab dentry start c2888110 pointer offset 0 size 36
+[ 1838.524786] Register r10 information: 141-page vmalloc region starting at 0xbf000000 allocat8
+[ 1838.538303] Register r11 information: non-slab/vmalloc memory
+[ 1838.545308] Register r12 information: slab trace_event_file start c245b5a0 pointer offset 0
+[ 1838.556149] Process modprobe (pid: 252, stack limit = 0x(ptrval))
+[ 1838.563555] Stack: (0xdcf09dc8 to 0xdcf0a000)
+[ 1838.569192] 9dc0:                   c3199180 c1a8fe48 bf07620c 00000000 bf07c510 bf07c7d4
+[ 1838.579914] 9de0: c1a8fe48 bf07620c c1a8ff38 c1c848cc bf07c800 c1a90234 bf07c510 bf07c7d4
+[ 1838.590697] 9e00: c1a8fe48 c040f9e4 c040f814 c1a90270 c1a901e8 00000001 00000000 bf07c800
+[ 1838.601521] 9e20: 00000001 c1a8ab30 00000002 c03690f0 bf07c800 00000001 dcf09f38 bf07c800
+[ 1838.612446] 9e40: bf07c80c dcf09ec4 bf05d6b4 0000000c 00000001 c03c2ec8 bf07c800 00000000
+[ 1838.623398] 9e60: c36073c0 00000000 000c9358 00000000 c3199180 00134e20 bf07c800 00000000
+[ 1838.634350] 9e80: 00000000 c1a8ab30 c14f7c2c c14f7c9c bf060aef 00000001 00000000 00000000
+[ 1838.645286] 9ea0: 00000000 00000000 bf05d054 c04ef160 bf05d678 00000005 6e72656b 00006c65
+[ 1838.656246] 9ec0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[ 1838.667261] 9ee0: 00000000 00000000 00000000 00000000 00000000 456be185 dcf09f34 00000000
+[ 1838.678254] 9f00: 00000004 00134e20 c3199180 c0300324 c3199180 0000017b 00120781 c03c34ac
+[ 1838.689315] 9f20: dcf09f34 7fffffff 00000000 00000002 00020000 dcf0b000 dcf81eac dcf7a000
+[ 1838.700403] 9f40: dcf0b000 000c9358 dcfd3958 dcfd36d0 dcf98460 0007d000 000836b0 0002e8d8
+[ 1838.711510] 9f60: 0008c74d 00000000 00000000 00000000 0002e8c8 0000003d 0000003e 0000001c
+[ 1838.722673] 9f80: 00000000 0000002f 00000000 456be185 00134e20 7fffffff 00000000 00134e20
+[ 1838.733835] 9fa0: 0000017b c03000c0 7fffffff 00000000 00000004 00134e20 00000000 b6f6cb90
+[ 1838.744973] 9fc0: 7fffffff 00000000 00134e20 0000017b b6f60950 0014abf0 0014a830 00120781
+[ 1838.756134] 9fe0: bed65b6c bed65b50 0003e1b4 000f1334 20000010 00000004 00000000 00000000
+[ 1838.767296]  event_create_dir from trace_module_notify+0x1d0/0x260
+[ 1838.775010]  trace_module_notify from blocking_notifier_call_chain_robust+0x64/0xdc
+[ 1838.785612]  blocking_notifier_call_chain_robust from load_module+0x19a0/0x1d78
+[ 1838.794466]  load_module from sys_finit_module+0xbc/0xf8
+[ 1838.801277]  sys_finit_module from ret_fast_syscall+0x0/0x54
+[ 1838.808424] Exception stack(0xdcf09fa8 to 0xdcf09ff0)
+[ 1838.814927] 9fa0:                   7fffffff 00000000 00000004 00134e20 00000000 b6f6cb90
+[ 1838.825939] 9fc0: 7fffffff 00000000 00134e20 0000017b b6f60950 0014abf0 0014a830 00120781
+[ 1838.836946] 9fe0: bed65b6c bed65b50 0003e1b4 000f1334
+[ 1838.843402] Code: e1540008 0affff8e e5943008 e1a01006 (e5930008)
+[ 1838.850943] ---[ end trace 0000000000000000 ]---
+
+modprobe brcmfmac solves this, but I dunno
+
+glibc port:
+... rest of stderr output deleted ...
+configure:3427: $? = 1
+configure:3416: arm-linux-gnueabihf-gcc AR=arm-linux-gnueabihf-ar -V >&5
+arm-linux-gnueabihf-gcc: error: unrecognized command-line option '-V'
+configure:3427: $? = 1
+configure:3416: arm-linux-gnueabihf-gcc AR=arm-linux-gnueabihf-ar -qversion >&5
+arm-linux-gnueabihf-gcc: error: unrecognized command-line option '-qversion'; did you mean '--version'?
+configure:3427: $? = 1
+configure:3416: arm-linux-gnueabihf-gcc AR=arm-linux-gnueabihf-ar -version >&5
+arm-linux-gnueabihf-gcc: error: unrecognized command-line option '-version'
+configure:3427: $? = 1
+configure:3432: checking for suffix of object files
+configure:3455: arm-linux-gnueabihf-gcc AR=arm-linux-gnueabihf-ar -c   conftest.c >&5
+arm-linux-gnueabihf-gcc: warning: AR=arm-linux-gnueabihf-ar: linker input file unused because linking not done
+arm-linux-gnueabihf-gcc: error: AR=arm-linux-gnueabihf-ar: linker input file not found: No such file or directory
+configure:3459: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "GNU C Library"
+| #define PACKAGE_TARNAME "glibc"
+| #define PACKAGE_VERSION "(see version.h)"
+| #define PACKAGE_STRING "GNU C Library (see version.h)"
+| #define PACKAGE_BUGREPORT "https://sourceware.org/bugzilla/"
+| #define PACKAGE_URL "https://www.gnu.org/software/glibc/"
+| #define PKGVERSION "(GNU libc) "
+| #define REPORT_BUGS_TO "<https://www.gnu.org/software/libc/bugs.html>"
+| /* end confdefs.h.  */
+|
+| int
+| main (void)
+| {
+|
+|   ;
+|   return 0;
+| }
+configure:3474: error: in `/tmp/nix-build/glibc-2.39/build':
+configure:3476: error: cannot compute suffix of object files: cannot compile
+
+!! BUT !!
+[nix-shell:/drives/hdd/clfs-nix/main]$ arm-linux-gnueabihf-gcc -c test.c
+
+[nix-shell:/drives/hdd/clfs-nix/main]$
+exit
+❯ file test.o
+test.o: ELF 32-bit LSB relocatable, ARM, EABI5 version 1 (SYSV), not stripped
+
