@@ -58,7 +58,9 @@ let
     binutils = binutils_nolib;
     crossConfig = crossConfig;
     mkDerivation = crossEnvNoCC.mkDerivation;
-    #mkDerivation = CCEnv.mkDerivation;
+    bison = pkgs.bison;
+    python3 = pkgs.python3;
+    coreutils = pkgs.coreutils;
   };
   libc = if targetPlatform.libc == "musl" then musl else glibc;
 

@@ -1,4 +1,4 @@
-{mkDerivation, sources, crossConfig, gcc, strace, binutils}:
+{mkDerivation, sources, crossConfig, gcc, strace, binutils, coreutils, bison, python3}:
 
 mkDerivation rec {
   name = "glibc";
@@ -8,6 +8,9 @@ mkDerivation rec {
   nativeBuildInputs = [
     gcc
     binutils
+    coreutils
+    bison
+    python3
   ];
 
   host = crossConfig.host;
@@ -31,7 +34,6 @@ mkDerivation rec {
   '';
 
   configurePhase = ''
-    #patch -Np1 -i ../glibc-2.39-fhs-1.patch
     echo "rootsbindir=/usr/sbin" > configparms
 
     sed -i '3466s/test $ac_status = 0; }/if test $ac_status = 0; then break; fi; }/' ../configure
