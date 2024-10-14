@@ -35,8 +35,8 @@ mkDerivation rec {
     echo "rootsbindir=/usr/sbin" > configparms
 
     TARGET=${target} \
-    BUILD_CC="gcc" CC="${target}-gcc \
-    AR="${target}-ar RANLIB="${target}-ranlib" \
+    BUILD_CC="gcc" CC="${target}-gcc" \
+    AR="${target}-ar" RANLIB="${target}-ranlib" \
     ../configure \
       CROSS_COMPILE=${target}- \
       --prefix=/ \
